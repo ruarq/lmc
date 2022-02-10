@@ -1,5 +1,5 @@
 ---
-AccessModifierOffset: 0
+AccessModifierOffset: -4
 AlignAfterOpenBracket: DontAlign
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments: None
@@ -27,7 +27,7 @@ BitFieldColonSpacing: None
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: true
-  AfterClass: false
+  AfterClass: true
   AfterControlStatement: Never
   AfterEnum: true
   AfterFunction: true
