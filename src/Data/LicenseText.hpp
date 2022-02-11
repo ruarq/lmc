@@ -24,7 +24,7 @@ namespace Lm
 {
 
 // TODO(ruarq): Add warranty and conditions options
-const auto licenseText = R"(lmc Copyright (C) 2022  ruarq
+const auto licenseText = R"(lmc  Copyright (C) 2022  ruarq
 This program comes with ABSOLUTELY NO WARRANTY; for details run with `--warranty`.
 This is free software, and you are welcome to redistribute it
 under certain conditions; run with `--conditions` for details.)";
