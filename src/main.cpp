@@ -23,10 +23,15 @@
 #include "Data/LicenseText.hpp"
 #include "Opt/Parse.hpp"
 
-// clang-format off
-auto main(int argc, char **argv) -> int
+// TODO(ruarq): File a bug report about this, clang format formats
+// "auto main(int argc, char **argv) -> int"
+// to
+// "automain(int argc, char **argv) -> int"
+// auto main(int argc, char **argv) -> int
+int main(int argc, char **argv)
 {
 	const std::vector<Lm::Opt::Option> options = {
+	// clang-format off
 		{
 			"version",
 			'v',
@@ -37,14 +42,6 @@ auto main(int argc, char **argv) -> int
 			}
 		},
 		{
-			"help",
-			'h',
-			Lm::Opt::Option::Argument::Optional,
-			[](const std::string &argument) {
-				std::cout << "Opt: " << argument << "\n";
-			}
-		},
-		{
 			"license",
 			0,
 			Lm::Opt::Option::Argument::None,
@@ -52,7 +49,7 @@ auto main(int argc, char **argv) -> int
 				std::cout << Lm::licenseText << "\n";
 			}
 		}
-		// clang-format on
+	// clang-format on
 	};
 
 	Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
