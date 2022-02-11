@@ -23,6 +23,7 @@
 #include "Locale.hpp"
 #include "Opt/Parse.hpp"
 #include "hcd/LicenseText.hpp"
+#include "hcd/WarrantyText.hpp"
 
 // TODO(ruarq): File a bug report about this, clang format formats
 // "auto main(int argc, char **argv) -> int"
@@ -54,8 +55,19 @@ int main(int argc, char **argv)
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
 				std::cout << Lm::licenseText << "\n";
+				exit(0);
 			},
 			"Show license information of lmc"
+		},
+		{
+			"warranty",
+			Lm::Opt::Option::noShortOption,
+			Lm::Opt::Option::Argument::None,
+			[](const std::string &) {
+				std::cout << Lm::warrantyText << "\n";
+				exit(0);
+			},
+			"Show warranty information of lmc"
 		},
 		{
 			"locale",
