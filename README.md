@@ -25,5 +25,5 @@ To build in release mode, simply pass `release` to the build script:
 ```
 
 ### Contribute
-Generally, I don't have any problem with voluntary contributions. Please read [this](contributing.md) document about contributing.
+Generally, I don't have any problem with voluntary contributions. Please read [this](contribute.md) document about contributing.
 Please also stick to the [styleguide](styleguide.md).
