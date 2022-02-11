@@ -19,11 +19,14 @@
  */
 
 #include <iostream>
+#include <string>
 
-#include "Locale.hpp"
+#include "Localization/Locale.hpp"
 #include "Opt/Parse.hpp"
 #include "hcd/LicenseText.hpp"
 #include "hcd/WarrantyText.hpp"
+
+using namespace std::string_literals;
 
 // TODO(ruarq): File a bug report about this, clang format formats
 // "auto main(int argc, char **argv) -> int"
@@ -32,6 +35,9 @@
 // auto main(int argc, char **argv) -> int
 int main(int argc, char **argv)
 {
+	Lm::Locale locale;
+	locale.LoadFromFile("data/locales/"s + Lm::Locale::Get());
+
 	// We need the help text in the "help" option, but
 	// we can only generate it after declaring the option
 	// array.
@@ -47,7 +53,7 @@ int main(int argc, char **argv)
 				std::cout << "Version\n";
 				std::exit(0);
 			},
-			"Get the version of lmc you're using"
+			locale.GetPhrase("HelpVersionDescription")
 		},
 		{
 			"license",
@@ -57,7 +63,7 @@ int main(int argc, char **argv)
 				std::cout << Lm::licenseText << "\n";
 				exit(0);
 			},
-			"Show license information of lmc"
+			locale.GetPhrase("HelpLicenseDescription")
 		},
 		{
 			"warranty",
@@ -67,7 +73,7 @@ int main(int argc, char **argv)
 				std::cout << Lm::warrantyText << "\n";
 				exit(0);
 			},
-			"Show warranty information of lmc"
+			locale.GetPhrase("HelpWarrantyDescription")
 		},
 		{
 			"locale",
@@ -89,18 +95,18 @@ int main(int argc, char **argv)
 					exit(1);
 				}
 			},
-			"Show information about the locale"
+			locale.GetPhrase("HelpLocaleDescription")
 		},
 		{
 			"help",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
-			[&helpText, &argv](const std::string &) {
-				std::cout << "usage: " << argv[0] << " [options] file...\n";
-				std::cout << "options:\n";
+			[&helpText, &argv, &locale](const std::string &) {
+				std::cout << locale.GetPhrase("Usage") << ": " << argv[0] << " [" << locale.GetPhrase("Options") << "] " << locale.GetPhrase("File") << "...\n";
+				std::cout << locale.GetPhrase("Options") << ":\n";
 				std::cout << helpText << "\n";
 			},
-			"Display this information"
+			locale.GetPhrase("HelpHelpDescription")
 		}
 	// clang-format on
 	};

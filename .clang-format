@@ -62,7 +62,7 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^<[a-z]*[^\.]>' # standard library headers always go top
+  - Regex: '^<([a-z]|_)*[^\.]>' # standard library headers always go top
     Priority: 1
   - Regex: '^<.*>'
     Priority: 2

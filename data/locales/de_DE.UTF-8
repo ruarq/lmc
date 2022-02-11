@@ -1,0 +1,14 @@
+Error													Fehler
+Usage													Aufruf
+Options													Optionen
+File													Datei
+
+LexerErrorUnknownToken									Unbekanntes Token '{}'
+LexerErrorUnterminatedString							String wurde nicht terminiert
+LexerErrorUnterminatedChar								Char wurde nicht terminiert
+
+HelpVersionDescription									Compilerversioninformationen anzeigen.
+HelpLicenseDescription									Compilerlizenzinformationen anzeigen.
+HelpWarrantyDescription									Compilergarantieinformationen anzeigen.
+HelpLocaleDescription									Die genutzte Lokalisierung anzeigen.
+HelpHelpDescription										Diese Informationen anzeigen.

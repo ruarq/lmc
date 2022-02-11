@@ -20,26 +20,53 @@
 
 #pragma once
 
+#include <array>
+#include <fstream>
 #include <string>
+#include <unordered_map>
 
-#include "Env.hpp"
+#include "../Env.hpp"
 
-namespace Lm::Locale
+namespace Lm
 {
 
-/**
- * @brief Get the country
- */
-auto Country() -> std::string;
+class Locale final
+{
+public:
+	/**
+	 * @brief Get the full locale
+	 */
+	static auto Get() -> std::string;
 
-/**
- * @brief Get the language
- */
-auto Language() -> std::string;
+	/**
+	 * @brief Get the country
+	 */
+	static auto Country() -> std::string;
 
-/**
- * @brief Get the encoding
- */
-auto Encoding() -> std::string;
+	/**
+	 * @brief Get the language
+	 */
+	static auto Language() -> std::string;
+
+	/**
+	 * @brief Get the encoding
+	 */
+	static auto Encoding() -> std::string;
+
+public:
+	/**
+	 * @brief Load the locale from a file
+	 * @return Whether loading was successful or not
+	 */
+	auto LoadFromFile(const std::string &filename) -> bool;
+
+	/**
+	 * @brief Get a phrase from the locale
+	 */
+	auto GetPhrase(const std::string &phrase) const -> const std::string &;
+
+private:
+	std::unordered_map<std::string, std::string> phrases;
+};
 
 }

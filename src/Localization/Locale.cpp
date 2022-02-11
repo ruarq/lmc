@@ -20,10 +20,15 @@
 
 #include "Locale.hpp"
 
-namespace Lm::Locale
+namespace Lm
 {
 
-auto Country() -> std::string
+auto Locale::Get() -> std::string
+{
+	return GetEnv("LANG");
+}
+
+auto Locale::Country() -> std::string
 {
 	const auto lang = GetEnv("LANG");
 	if (lang.empty())
@@ -34,7 +39,7 @@ auto Country() -> std::string
 	return lang.substr(3, 2);
 }
 
-auto Language() -> std::string
+auto Locale::Language() -> std::string
 {
 	const auto lang = GetEnv("LANG");
 	if (lang.empty())
@@ -45,7 +50,7 @@ auto Language() -> std::string
 	return lang.substr(0, 2);
 }
 
-auto Encoding() -> std::string
+auto Locale::Encoding() -> std::string
 {
 	const auto lang = GetEnv("LANG");
 	if (lang.empty())
@@ -54,6 +59,40 @@ auto Encoding() -> std::string
 	}
 
 	return lang.substr(lang.find_last_of('.') + 1);
+}
+
+auto Locale::LoadFromFile(const std::string &filename) -> bool
+{
+	auto ParseLine = [this](const std::string &line) {
+		if (line.empty())
+		{
+			return;
+		}
+
+		const auto key = line.substr(0, line.find_first_of(" \t"));
+		const auto value = line.substr(line.find_first_of(" \t"));
+
+		this->phrases[key] = value.substr(value.find_first_not_of(" \t"));
+	};
+
+	std::ifstream file(filename);
+	if (!file.is_open())
+	{
+		return false;
+	}
+
+	std::string line;
+	while (std::getline(file, line))
+	{
+		ParseLine(line);
+	}
+
+	return true;
+}
+
+auto Locale::GetPhrase(const std::string &phrase) const -> const std::string &
+{
+	return phrases.at(phrase);
 }
 
 }

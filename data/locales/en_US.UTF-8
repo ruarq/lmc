@@ -1,0 +1,14 @@
+Error													error
+Usage													usage
+Options													options
+File													file
+
+LexerErrorUnknownToken									unknown token '{}'
+LexerErrorUnterminatedString							missing terminating "
+LexerErrorUnterminatedChar								missing terminating '
+
+HelpVersionDescription									Get the version of lmc you're using
+HelpLicenseDescription									Show the license lmc is using
+HelpWarrantyDescription									Show warranty
+HelpLocaleDescription									Get the locale used by lmc
+HelpHelpDescription										Show this information
