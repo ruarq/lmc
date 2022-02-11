@@ -124,4 +124,39 @@ auto InvokeOption(const std::vector<std::string> &argv, size_t &arg, const Optio
 	}
 }
 
+auto GenerateHelpText(const std::vector<Option> &options) -> std::string
+{
+	std::string helpText;
+
+	for (const auto &option : options)
+	{
+		helpText += "\t";
+
+		if (option.shortString && option.longString.empty())
+		{
+			helpText += "-"s + option.shortString;
+		}
+		else if (!option.shortString && !option.longString.empty())
+		{
+			helpText += "--"s + option.longString;
+		}
+		else if (option.shortString && !option.longString.empty())
+		{
+			helpText += "-"s + option.shortString;
+			helpText += ", --"s + option.longString;
+		}
+
+		if (!option.description.empty())
+		{
+			helpText += "\n\t\t";
+			helpText += option.description;
+			helpText += "\n";
+		}
+
+		helpText += "\n";
+	}
+
+	return helpText;
+}
+
 }

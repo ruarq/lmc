@@ -47,11 +47,13 @@ auto Option::GetType(const std::string &string) -> Option::Type
 Option::Option(const std::string &longString,
 	const char shortString,
 	const Argument argument,
-	const OptionInvokeFn &Invoke)
+	const OptionInvokeFn &Invoke,
+	const std::string &description)
 	: longString(longString)
 	, shortString(shortString)
 	, argument(argument)
 	, Invoke(Invoke)
+	, description(description)
 {
 }
 

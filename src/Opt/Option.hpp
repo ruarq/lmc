@@ -74,7 +74,8 @@ public:
 	Option(const std::string &longString,
 		const char shortString,
 		const Argument argument,
-		const OptionInvokeFn &Invoke);
+		const OptionInvokeFn &Invoke,
+		const std::string &description = {});
 
 public:
 	/// The long version of the option.
@@ -91,6 +92,11 @@ public:
 	/// The invokation function. Get's called by Lm::Opt::Parse,
 	/// if the option occured in argv
 	const std::function<void(std::string)> Invoke;
+
+	/// The description of the Option. This is optional, but helpful
+	/// if you want to use Lm::Opt::GenerateHelpText, which uses
+	/// the description of the Option to generate a help text
+	const std::string description;
 };
 
 }

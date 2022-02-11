@@ -30,6 +30,11 @@
 // auto main(int argc, char **argv) -> int
 int main(int argc, char **argv)
 {
+	// We need the help text in the "help" option, but
+	// we can only generate it after declaring the option
+	// array.
+	std::string helpText;
+
 	const std::vector<Lm::Opt::Option> options = {
 	// clang-format off
 		{
@@ -39,7 +44,8 @@ int main(int argc, char **argv)
 			[](const std::string &) {
 				std::cout << "Version\n";
 				std::exit(0);
-			}
+			},
+			"Get the version of lmc you're using"
 		},
 		{
 			"license",
@@ -47,10 +53,23 @@ int main(int argc, char **argv)
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
 				std::cout << Lm::licenseText << "\n";
-			}
+			},
+			"Show license information of lmc"
+		},
+		{
+			"help",
+			0,
+			Lm::Opt::Option::Argument::None,
+			[&helpText](const std::string &) {
+				std::cout << helpText << "\n";
+			},
+			"Display this information"
 		}
 	// clang-format on
 	};
+
+	// Generate help text
+	helpText = Lm::Opt::GenerateHelpText(options);
 
 	const auto files = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
 
