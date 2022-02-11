@@ -1,4 +1,7 @@
 /**
+ * @author ruarq
+ * @date 09.02.2022 
+ *
  * lmc is the official compiler for the Lumin programming language.
  * Copyright (C) 2022 ruarq
  *

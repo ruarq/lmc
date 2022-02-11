@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 10.02.2022 
+ * @date 11.02.2022 
  *
  * lmc is the official compiler for the Lumin programming language.
  * Copyright (C) 2022 ruarq
@@ -18,15 +18,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "Option.hpp"
 
-namespace Lm
+using namespace std::string_literals;
+
+namespace Lm::Opt
 {
 
-// TODO(ruarq): Add warranty and conditions options
-const auto licenseText = R"(lmc Copyright (C) 2022  ruarq
-This program comes with ABSOLUTELY NO WARRANTY; for details run with `--warranty`.
-This is free software, and you are welcome to redistribute it
-under certain conditions; run with `--conditions` for details.)";
+auto Option::GetType(const std::string &string) -> Option::Type
+{
+	if (string.empty())
+	{
+		return Type::None;
+	}
+
+	if (string.size() >= 2 && string.substr(0, 2) == "--"s)
+	{
+		return Type::LongOption;
+	}
+	else if (string.substr(0, 1) == "-"s)
+	{
+		return Type::ShortOption;
+	}
+
+	return Type::None;
+}
+
+Option::Option(const std::string &longString,
+	const char shortString,
+	const Argument argument,
+	const OptionInvokeFn &Invoke)
+	: longString(longString)
+	, shortString(shortString)
+	, argument(argument)
+	, Invoke(Invoke)
+{
+}
 
 }
