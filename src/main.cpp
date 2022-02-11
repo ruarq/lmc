@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		},
 		{
 			"license",
-			0,
+			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
 				std::cout << Lm::licenseText << "\n";
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 		},
 		{
 			"help",
-			0,
+			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[&helpText](const std::string &) {
 				std::cout << helpText << "\n";

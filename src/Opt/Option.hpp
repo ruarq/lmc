@@ -57,12 +57,17 @@ public:
 		LongOption
 	};
 
+public:
 	/**
 	 * @brief Parse a string to get the type of an option.
 	 * @param string The string to parse.
 	 * @return Lm::Opt::Option::Type::None if it's not an option
 	 */
 	static auto GetType(const std::string &string) -> Type;
+
+public:
+	static constexpr auto noShortOption = 0;
+	static constexpr auto noLongOption = "";
 
 public:
 	/**
