@@ -3,7 +3,7 @@ For things that have do be done, look into the issues section. If no issues exis
 
 Please stick to what I've written here, else your work might be rejected.
 
-Also note, that just sticking to the rules will not automatically mean your pull request
+Also note that just sticking to the rules will not automatically mean your pull request
 will be accepted. I might reject it either way.
 
 ## Rules
