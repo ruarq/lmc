@@ -44,6 +44,7 @@ auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &opti
 
 auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> bool
 {
+	bool optionNotFound = true;
 	const std::string argString = argv.at(arg);
 	switch (Option::GetType(argString))
 	{
@@ -54,7 +55,9 @@ auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::v
 			{
 				if (option.shortString == argName)
 				{
+					optionNotFound = false;
 					InvokeOption(argv, arg, option);
+					break;
 				}
 			}
 		}
@@ -67,13 +70,21 @@ auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::v
 			{
 				if (option.longString == argName)
 				{
+					optionNotFound = false;
 					InvokeOption(argv, arg, option);
+					break;
 				}
 			}
 		}
 		break;
 
 		default: return false;
+	}
+
+	if (optionNotFound)
+	{
+		// TODO(ruarq): Quickly write a logging library as we do not want to use std::cout raw
+		std::cout << argv.at(0) << ": unrecognized command-line option '" << argv.at(arg) << "'\n";
 	}
 
 	return true;

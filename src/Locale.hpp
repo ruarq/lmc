@@ -18,43 +18,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Option.hpp"
+#pragma once
 
-using namespace std::string_literals;
+#include <string>
 
-namespace Lm::Opt
+#include "Env.hpp"
+
+namespace Lm::Locale
 {
 
-auto Option::GetType(const std::string &string) -> Option::Type
-{
-	if (string.empty())
-	{
-		return Type::None;
-	}
+/**
+ * @brief Get the country
+ */
+auto Country() -> std::string;
 
-	if (string.substr(0, 2) == "--"s)
-	{
-		return Type::LongOption;
-	}
-	else if (string.substr(0, 1) == "-"s)
-	{
-		return Type::ShortOption;
-	}
+/**
+ * @brief Get the language
+ */
+auto Language() -> std::string;
 
-	return Type::None;
-}
-
-Option::Option(const std::string &longString,
-	const char shortString,
-	const Argument argument,
-	const OptionInvokeFn &Invoke,
-	const std::string &description)
-	: longString(longString)
-	, shortString(shortString)
-	, argument(argument)
-	, Invoke(Invoke)
-	, description(description)
-{
-}
+/**
+ * @brief Get the encoding
+ */
+auto Encoding() -> std::string;
 
 }

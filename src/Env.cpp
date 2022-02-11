@@ -18,43 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Option.hpp"
+#include "Env.hpp"
 
-using namespace std::string_literals;
+#include <cstdlib>
 
-namespace Lm::Opt
+namespace Lm
 {
 
-auto Option::GetType(const std::string &string) -> Option::Type
+auto GetEnv(const std::string &env) -> std::string
 {
-	if (string.empty())
-	{
-		return Type::None;
-	}
-
-	if (string.substr(0, 2) == "--"s)
-	{
-		return Type::LongOption;
-	}
-	else if (string.substr(0, 1) == "-"s)
-	{
-		return Type::ShortOption;
-	}
-
-	return Type::None;
-}
-
-Option::Option(const std::string &longString,
-	const char shortString,
-	const Argument argument,
-	const OptionInvokeFn &Invoke,
-	const std::string &description)
-	: longString(longString)
-	, shortString(shortString)
-	, argument(argument)
-	, Invoke(Invoke)
-	, description(description)
-{
+	return std::getenv(env.c_str()) ?: std::string {};
 }
 
 }

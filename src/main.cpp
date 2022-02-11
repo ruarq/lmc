@@ -20,8 +20,9 @@
 
 #include <iostream>
 
-#include "Data/LicenseText.hpp"
+#include "Locale.hpp"
 #include "Opt/Parse.hpp"
+#include "hcd/LicenseText.hpp"
 
 // TODO(ruarq): File a bug report about this, clang format formats
 // "auto main(int argc, char **argv) -> int"
@@ -55,6 +56,28 @@ int main(int argc, char **argv)
 				std::cout << Lm::licenseText << "\n";
 			},
 			"Show license information of lmc"
+		},
+		{
+			"locale",
+			Lm::Opt::Option::noShortOption,
+			Lm::Opt::Option::Argument::None,
+			[](const std::string &) {
+				const auto language = Lm::Locale::Language();
+				const auto country = Lm::Locale::Country();
+				const auto encoding = Lm::Locale::Encoding();
+
+				if (!language.empty() && !country.empty() && !encoding.empty())
+				{
+					std::cout << language << "_" << country << "." << encoding << "\n";
+					exit(0);
+				}
+				else
+				{
+					std::cout << "There was a problem.\nLANG=" << Lm::GetEnv("LANG") << "\n";
+					exit(1);
+				}
+			},
+			"Show information about the locale"
 		},
 		{
 			"help",
