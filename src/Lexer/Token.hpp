@@ -121,8 +121,8 @@ public:
 	Token(const Type type, const std::string &literal);
 
 public:
-	Type type;				///< the type of the token
-	std::string literal;	///< the literal of the token
+	const Type type;			  ///< the type of the token
+	const std::string literal;	  ///< the literal of the token
 };
 
 }
