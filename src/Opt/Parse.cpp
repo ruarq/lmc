@@ -167,7 +167,7 @@ auto GenerateHelpText(const std::vector<Option> &options) -> std::string
 		helpText += "\n";
 	}
 
-	return helpText;
+	return helpText.substr(0, helpText.find_last_not_of('\n') + 2);
 }
 
 }

@@ -83,7 +83,9 @@ int main(int argc, char **argv)
 			"help",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
-			[&helpText](const std::string &) {
+			[&helpText, &argv](const std::string &) {
+				std::cout << "usage: " << argv[0] << " [options] file...\n";
+				std::cout << "options:\n";
 				std::cout << helpText << "\n";
 			},
 			"Display this information"
