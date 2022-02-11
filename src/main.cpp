@@ -52,7 +52,12 @@ int main(int argc, char **argv)
 	// clang-format on
 	};
 
-	Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
+	const auto files = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
+
+	for (const auto &file : files)
+	{
+		std::cout << file << "\n";
+	}
 
 	return 0;
 }

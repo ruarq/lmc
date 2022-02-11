@@ -28,12 +28,17 @@
 namespace Lm::Opt
 {
 
-auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options) -> void;
+/**
+ * @brief parse argc & argv
+ * @return all non-option argument in argv
+ */
+auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options) -> std::vector<std::string>;
 
 /**
  * @brief Called by Lm::Opt::Parse
+ * @return true if the option at arg was an option, false if not
  */
-auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> void;
+auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> bool;
 
 /**
  * @brief Called by Lm::Opt::ParseOption

@@ -27,15 +27,22 @@ using namespace std::string_literals;
 namespace Lm::Opt
 {
 
-auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options) -> void
+auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options) -> std::vector<std::string>
 {
+	std::vector<std::string> nonOptions;
+
 	for (size_t arg = 1; arg < argv.size(); ++arg)
 	{
-		ParseOption(argv, arg, options);
+		if (!ParseOption(argv, arg, options))
+		{
+			nonOptions.push_back(argv.at(arg));
+		}
 	}
+
+	return nonOptions;
 }
 
-auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> void
+auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> bool
 {
 	const std::string argString = argv.at(arg);
 	switch (Option::GetType(argString))
@@ -66,8 +73,10 @@ auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::v
 		}
 		break;
 
-		default: break;
+		default: return false;
 	}
+
+	return true;
 }
 
 auto InvokeOption(const std::vector<std::string> &argv, size_t &arg, const Option &option) -> void
