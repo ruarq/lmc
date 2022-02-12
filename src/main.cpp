@@ -22,6 +22,8 @@
 
 #include <fmt/format.h>
 
+#include "File.hpp"
+#include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Opt/Parse.hpp"
 #include "hcd/LicenseText.hpp"
@@ -103,11 +105,19 @@ int main(int argc, char **argv)
 	// Generate help text
 	helpText = Lm::Opt::GenerateHelpText(options);
 
-	const auto files = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
+	const auto filenames = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
 
-	for (const auto &file : files)
+	for (const auto &filename : filenames)
 	{
-		fmt::print("{}\n", file);
+		const Lm::File file(filename);
+
+		Lm::Lexer lexer;
+		const auto tokens = lexer.Run(file);
+
+		for (const auto &token : tokens)
+		{
+			fmt::print("'{}'\n", token.literal);
+		}
 	}
 
 	return 0;

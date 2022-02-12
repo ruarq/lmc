@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "../File.hpp"
+
 namespace Lm
 {
 
@@ -38,10 +40,10 @@ public:
 	{
 		LParen,			 ///< (
 		RParen,			 ///< )
-		LCurly,			 ///< {
-		RCurly,			 ///< }
 		LBracket,		 ///< [
 		RBracket,		 ///< ]
+		LCurly,			 ///< {
+		RCurly,			 ///< }
 		Dot,			 ///< .
 		Comma,			 ///< ,
 		Arrow,			 ///< ->
@@ -81,7 +83,7 @@ public:
 		LShiftEqual,	 ///< <<=
 		RShift,			 ///< >>
 		RShiftEqual,	 ///< >>=
-		Dollar,			 ///< $
+		Cast,			 ///< $
 
 		Fn,			 ///< fn
 		Mut,		 ///< mut
@@ -117,15 +119,19 @@ public:
 		Int32Literal,	   ///< 1234567890
 		Float64Literal,	   ///< 123.456
 		StringLiteral,	   ///< ""
-		CharLiteral		   ///< ''
+		CharLiteral,	   ///< ''
+
+		Unknown,	///< Generated for tokens that are unknown
+		Eof			///< End of file token
 	};
 
 public:
-	Token(const Type type, const std::string &literal);
+	Token(const Type type, const std::string &literal, const FileLoc &start, const FileLoc &end);
 
 public:
-	const Type type;			  ///< the type of the token
-	const std::string literal;	  ///< the literal of the token
+	const Type type;			  ///< The type of the token
+	const std::string literal;	  ///< The literal of the token
+	const FileLoc start, end;	  ///< Start and end locations of the literal
 };
 
 }

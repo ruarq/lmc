@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 11.02.2022 
+ * @date 12.02.2022 
  *
  * lmc is the official compiler for the Lumin programming language.
  * Copyright (C) 2022 ruarq
@@ -18,17 +18,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Token.hpp"
+#pragma once
+
+#include <fstream>
+#include <string>
 
 namespace Lm
 {
 
-Token::Token(const Type type, const std::string &literal, const FileLoc &start, const FileLoc &end)
-	: type(type)
-	, literal(literal)
-	, start(start)
-	, end(end)
+/**
+ * @brief Simple file information
+ */
+class File final
 {
-}
+public:
+	/**
+	 * @brief Load from file
+	 * @param filename The name of the file
+	 */
+	File(const std::string &filename);
+
+public:
+	std::string name;
+	std::string content;
+};
+
+/**
+ * @brief Store a location in a file
+ */
+struct FileLoc final
+{
+	size_t line = 0;
+	size_t column = 0;
+};
 
 }
