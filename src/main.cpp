@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 
 		for (const auto &token : tokens)
 		{
-			fmt::print("{} '{}'\n", (size_t)(token.type), token.literal);
+			fmt::print("{}\n", token.literal);
 		}
 	}
 
