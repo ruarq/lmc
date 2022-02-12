@@ -46,6 +46,11 @@ private:
 	auto NextToken() -> Token;
 
 	/**
+	 * @brief Lex an identifier
+	 */
+	auto Identifier() -> Token;
+
+	/**
 	 * @brief Skip whitespace
 	 */
 	auto SkipWhitespace() -> void;
@@ -64,7 +69,7 @@ private:
 	 * @brief Match the string against all characters at current + following
 	 * @return True if the string matches
 	 */
-	auto Match(const std::string &match) -> bool;
+	auto Match(const std::string &match, const size_t offset = 0) -> bool;
 
 	/**
 	 * @return True if eof, false if not

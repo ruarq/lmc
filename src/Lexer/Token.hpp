@@ -94,6 +94,8 @@ public:
 		Struct,		 ///< struct
 		Local,		 ///< local
 		Match,		 ///< match
+		For,		 ///< for
+		Loop,		 ///< loop
 		If,			 ///< if
 		Elif,		 ///< elif
 		Else,		 ///< else
@@ -115,6 +117,7 @@ public:
 		Bool,		 ///< bool
 		True,		 ///< true
 		False,		 ///< false
+		Ident,		 ///< Identifier
 
 		Int32Literal,	   ///< 1234567890
 		Float64Literal,	   ///< 123.456
