@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 				fmt::print("Version");
 				std::exit(0);
 			},
-			Lm::Locale::Get("HelpVersionDescription")
+			Lm::Locale::Get("HELP_VERSION_DESCRIPTION")
 		},
 		{
 			"license",
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 				fmt::print("{}\n", Lm::licenseText);
 				std::exit(0);
 			},
-			Lm::Locale::Get("HelpLicenseDescription")
+			Lm::Locale::Get("HELP_LICENSE_DESCRIPTION")
 		},
 		{
 			"warranty",
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 				fmt::print("{}\n", Lm::warrantyText);
 				std::exit(0);
 			},
-			Lm::Locale::Get("HelpWarrantyDescription")
+			Lm::Locale::Get("HELP_WARRANTY_DESCRIPTION")
 		},
 		{
 			"locale",
@@ -83,19 +83,19 @@ int main(int argc, char **argv)
 				fmt::print("{}\n", Lm::Locale::Full());
 				std::exit(0);
 			},
-			Lm::Locale::Get("HelpLocaleDescription")
+			Lm::Locale::Get("HELP_LOCALE_DESCRIPTION")
 		},
 		{
 			"help",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[&helpText, &argv](const std::string &) {
-				fmt::print(Lm::Locale::Get("UsageString") + "\n"s, argv[0]);
-				fmt::print("{}:\n", Lm::Locale::Get("Options"));
+				fmt::print(Lm::Locale::Get("USAGE_STRING") + "\n"s, argv[0]);
+				fmt::print("{}:\n", Lm::Locale::Get("OPTIONS"));
 				fmt::print("{}\n", helpText);
 				std::exit(0);
 			},
-			Lm::Locale::Get("HelpHelpDescription")
+			Lm::Locale::Get("HELP_HELP_DESCRIPTION")
 		}
 	// clang-format on
 	};

@@ -1,15 +1,15 @@
-Error													error
-FatalError												fatal error
+ERROR													error
+FATAL_ERROR												fatal error
 
-UsageString												Usage: {} [options] file...
-Options													Options
+USAGE_STRING											Usage: {} [options] file...
+OPTIONS													Options
 
-LexerErrorUnknownToken									unknown token '{}'
-LexerErrorUnterminatedString							missing terminating "
-LexerErrorUnterminatedChar								missing terminating '
+LEXER_ERROR_UNKNOWN_TOKEN								unknown token '{}'
+LEXER_ERROR_UNTERMINATED_STRING							missing terminating "
+LEXER_ERROR_UNTERMINATED_CHAR							missing terminating '
 
-HelpVersionDescription									Get the version of lmc you're using
-HelpLicenseDescription									Show the license lmc is using
-HelpWarrantyDescription									Show warranty
-HelpLocaleDescription									Get the locale used by lmc
-HelpHelpDescription										Show this information
+HELP_VERSION_DESCRIPTION								Get the version of lmc you're using
+HELP_LICENSE_DESCRIPTION								Show the license lmc is using
+HELP_WARRANTY_DESCRIPTION								Show warranty
+HELP_LOCALE_DESCRIPTION									Get the locale used by lmc
+HELP_HELP_DESCRIPTION									Show this information

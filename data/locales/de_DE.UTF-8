@@ -1,13 +1,13 @@
-Error													Fehler
-UsageString												Aufruf: {} [Optionen] Datei...
-Options													Optionen
+ERROR													Fehler
+USAGE_STRING											Aufruf: {} [Optionen] Datei...
+OPTIONS													Optionen
 
-LexerErrorUnknownToken									Unbekanntes Token '{}'
-LexerErrorUnterminatedString							String wurde nicht terminiert
-LexerErrorUnterminatedChar								Char wurde nicht terminiert
+LEXER_ERROR_UNKNOWN_TOKEN								Unbekanntes Token '{}'
+LEXER_ERROR_UNTERMINATED_STRING							String wurde nicht terminiert
+LEXER_ERROR_UNTERMINATED_CHAR							Char wurde nicht terminiert
 
-HelpVersionDescription									Compilerversioninformationen anzeigen
-HelpLicenseDescription									Compilerlizenzinformationen anzeigen
-HelpWarrantyDescription									Compilergarantieinformationen anzeigen
-HelpLocaleDescription									Die genutzte Lokalisierung anzeigen
-HelpHelpDescription										Diese Informationen anzeigen
+HELP_VERSION_DESCRIPTION								Compilerversioninformationen anzeigen
+HELP_LICENSE_DESCRIPTION								Compilerlizenzinformationen anzeigen
+HELP_WARRANTY_DESCRIPTION								Compilergarantieinformationen anzeigen
+HELP_LOCALE_DESCRIPTION									Die genutzte Lokalisierung anzeigen
+HELP_HELP_DESCRIPTION									Diese Informationen anzeigen

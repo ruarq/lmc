@@ -25,7 +25,10 @@
 #include <string>
 #include <unordered_map>
 
+#include <fmt/format.h>
+
 #include "../Env.hpp"
+#include "../Log/Debug.hpp"
 
 namespace Lm
 {
