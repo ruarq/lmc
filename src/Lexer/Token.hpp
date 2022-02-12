@@ -82,8 +82,6 @@ public:
 		RShift,			 ///< >>
 		RShiftEqual,	 ///< >>=
 		Dollar,			 ///< $
-		Quote,			 ///< '
-		DoubleQuote,	 ///< "
 
 		Fn,			 ///< fn
 		Mut,		 ///< mut
@@ -115,6 +113,11 @@ public:
 		Bool,		 ///< bool
 		True,		 ///< true
 		False,		 ///< false
+
+		Int32Literal,	   ///< 1234567890
+		Float64Literal,	   ///< 123.456
+		StringLiteral,	   ///< ""
+		CharLiteral		   ///< ''
 	};
 
 public:
