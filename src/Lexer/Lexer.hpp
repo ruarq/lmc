@@ -51,6 +51,16 @@ private:
 	auto Identifier() -> Token;
 
 	/**
+	 * @brief Lex a number literal
+	 */
+	auto Number() -> Token;
+
+	/**
+	 * @brief Lex a string literal
+	 */
+	auto String() -> Token;
+
+	/**
 	 * @brief Skip whitespace
 	 */
 	auto SkipWhitespace() -> void;

@@ -60,9 +60,21 @@ auto Lexer::NextToken() -> Token
 	const auto currentChar = Current();
 	switch (currentChar)
 	{
+		case '0' ... '9': return Number();
+
 		case 'a' ... 'z':
 		case 'A' ... 'Z':
 		case '_': return Identifier();
+
+		case '"': return String();
+		case '\'':
+		{
+			const auto start = pos;
+			Consume();
+			const std::string literal { Consume() };
+			Consume(/* '\'' */);
+			return Token(Token::Type::CharLiteral, literal, start, pos);
+		}
 
 		case '(': return SingleToken(Token::Type::LParen);
 		case ')': return SingleToken(Token::Type::RParen);
@@ -544,13 +556,56 @@ auto Lexer::Identifier() -> Token
 	};
 
 	std::string literal;
-	const FileLoc prev = pos;
+	const auto start = pos;
 	while (IsIdent(Current()))
 	{
 		literal += Consume();
 	}
 
-	return Token(GetKeywordType(literal), literal, prev, pos);
+	return Token(GetKeywordType(literal), literal, start, pos);
+}
+
+auto Lexer::Number() -> Token
+{
+	auto IsNumber = [](const char c) {
+		return c >= '0' && c <= '9';
+	};
+
+	std::string literal;
+	auto type = Token::Type::Int32Literal;
+	const auto start = pos;
+
+	while (IsNumber(Current()))
+	{
+		literal += Consume();
+	}
+
+	if (Current() == '.')
+	{
+		literal += Consume();
+		type = Token::Type::Float64Literal;
+		while (IsNumber(Consume()))
+		{
+			literal += Consume();
+		}
+	}
+
+	return Token(type, literal, start, pos);
+}
+
+auto Lexer::String() -> Token
+{
+	const auto start = pos;
+	const auto quote = Consume();
+
+	std::string literal;
+	while (Current() != quote)
+	{
+		literal += Consume();
+	}
+	Consume();
+
+	return Token(Token::Type::StringLiteral, literal, start, pos);
 }
 
 auto Lexer::SkipWhitespace() -> void
