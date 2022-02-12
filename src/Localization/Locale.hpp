@@ -36,7 +36,7 @@ public:
 	/**
 	 * @brief Get the full locale
 	 */
-	static auto Get() -> std::string;
+	static auto Full() -> std::string;
 
 	/**
 	 * @brief Get the country
@@ -58,15 +58,15 @@ public:
 	 * @brief Load the locale from a file
 	 * @return Whether loading was successful or not
 	 */
-	auto LoadFromFile(const std::string &filename) -> bool;
+	static auto LoadFromFile(const std::string &filename) -> bool;
 
 	/**
 	 * @brief Get a phrase from the locale
 	 */
-	auto GetPhrase(const std::string &phrase) const -> const std::string &;
+	static auto Get(const std::string &phrase) -> const std::string &;
 
 private:
-	std::unordered_map<std::string, std::string> phrases;
+	static std::unordered_map<std::string, std::string> phrases;
 };
 
 }

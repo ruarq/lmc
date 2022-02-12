@@ -10,6 +10,7 @@ Fast. Simple. Beautiful. (pun intended)
 - clang++:13.0.1
 - clang-format:13.0.1
 - make:4.3
+- libfmt:8.1.1-1
 
 #### Linux
 Linux is the only officially supported platform, though in theory, the code *should* work on Windows or even MacOS.

@@ -1,7 +1,8 @@
 Error													error
-Usage													usage
-Options													options
-File													file
+FatalError												fatal error
+
+UsageString												Usage: {} [options] file...
+Options													Options
 
 LexerErrorUnknownToken									unknown token '{}'
 LexerErrorUnterminatedString							missing terminating "

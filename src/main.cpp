@@ -18,8 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <string>
+
+#include <fmt/format.h>
 
 #include "Localization/Locale.hpp"
 #include "Opt/Parse.hpp"
@@ -35,8 +36,7 @@ using namespace std::string_literals;
 // auto main(int argc, char **argv) -> int
 int main(int argc, char **argv)
 {
-	Lm::Locale locale;
-	locale.LoadFromFile("data/locales/"s + Lm::Locale::Get());
+	Lm::Locale::LoadFromFile("data/locales/"s + Lm::Locale::Full());
 
 	// We need the help text in the "help" option, but
 	// we can only generate it after declaring the option
@@ -50,63 +50,52 @@ int main(int argc, char **argv)
 			'v',
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
-				std::cout << "Version\n";
+				fmt::print("Version");
 				std::exit(0);
 			},
-			locale.GetPhrase("HelpVersionDescription")
+			Lm::Locale::Get("HelpVersionDescription")
 		},
 		{
 			"license",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
-				std::cout << Lm::licenseText << "\n";
-				exit(0);
+				fmt::print("{}\n", Lm::licenseText);
+				std::exit(0);
 			},
-			locale.GetPhrase("HelpLicenseDescription")
+			Lm::Locale::Get("HelpLicenseDescription")
 		},
 		{
 			"warranty",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
-				std::cout << Lm::warrantyText << "\n";
-				exit(0);
+				fmt::print("{}\n", Lm::warrantyText);
+				std::exit(0);
 			},
-			locale.GetPhrase("HelpWarrantyDescription")
+			Lm::Locale::Get("HelpWarrantyDescription")
 		},
 		{
 			"locale",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
 			[](const std::string &) {
-				const auto language = Lm::Locale::Language();
-				const auto country = Lm::Locale::Country();
-				const auto encoding = Lm::Locale::Encoding();
-
-				if (!language.empty() && !country.empty() && !encoding.empty())
-				{
-					std::cout << language << "_" << country << "." << encoding << "\n";
-					exit(0);
-				}
-				else
-				{
-					std::cout << "There was a problem.\nLANG=" << Lm::GetEnv("LANG") << "\n";
-					exit(1);
-				}
+				fmt::print("{}\n", Lm::Locale::Full());
+				std::exit(0);
 			},
-			locale.GetPhrase("HelpLocaleDescription")
+			Lm::Locale::Get("HelpLocaleDescription")
 		},
 		{
 			"help",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
-			[&helpText, &argv, &locale](const std::string &) {
-				std::cout << locale.GetPhrase("Usage") << ": " << argv[0] << " [" << locale.GetPhrase("Options") << "] " << locale.GetPhrase("File") << "...\n";
-				std::cout << locale.GetPhrase("Options") << ":\n";
-				std::cout << helpText << "\n";
+			[&helpText, &argv](const std::string &) {
+				fmt::print(Lm::Locale::Get("UsageString") + "\n"s, argv[0]);
+				fmt::print("{}:\n", Lm::Locale::Get("Options"));
+				fmt::print("{}\n", helpText);
+				std::exit(0);
 			},
-			locale.GetPhrase("HelpHelpDescription")
+			Lm::Locale::Get("HelpHelpDescription")
 		}
 	// clang-format on
 	};
@@ -118,7 +107,7 @@ int main(int argc, char **argv)
 
 	for (const auto &file : files)
 	{
-		std::cout << file << "\n";
+		fmt::print("{}\n", file);
 	}
 
 	return 0;

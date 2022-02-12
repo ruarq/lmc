@@ -23,7 +23,9 @@
 namespace Lm
 {
 
-auto Locale::Get() -> std::string
+std::unordered_map<std::string, std::string> Locale::phrases;
+
+auto Locale::Full() -> std::string
 {
 	return GetEnv("LANG");
 }
@@ -63,7 +65,7 @@ auto Locale::Encoding() -> std::string
 
 auto Locale::LoadFromFile(const std::string &filename) -> bool
 {
-	auto ParseLine = [this](const std::string &line) {
+	auto ParseLine = [](const std::string &line) {
 		if (line.empty())
 		{
 			return;
@@ -72,7 +74,7 @@ auto Locale::LoadFromFile(const std::string &filename) -> bool
 		const auto key = line.substr(0, line.find_first_of(" \t"));
 		const auto value = line.substr(line.find_first_of(" \t"));
 
-		this->phrases[key] = value.substr(value.find_first_not_of(" \t"));
+		phrases[key] = value.substr(value.find_first_not_of(" \t"));
 	};
 
 	std::ifstream file(filename);
@@ -90,7 +92,7 @@ auto Locale::LoadFromFile(const std::string &filename) -> bool
 	return true;
 }
 
-auto Locale::GetPhrase(const std::string &phrase) const -> const std::string &
+auto Locale::Get(const std::string &phrase) -> const std::string &
 {
 	return phrases.at(phrase);
 }

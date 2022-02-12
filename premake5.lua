@@ -8,6 +8,8 @@ project "lmc"
 	cppdialect "C++17"
 	warnings "Extra"
 
+	links { "fmt" }
+
 	files { "src/**.hpp", "src/**.cpp" }
 
 	filter { "configurations:debug" }
