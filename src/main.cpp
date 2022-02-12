@@ -26,8 +26,6 @@
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Opt/Parse.hpp"
-#include "hcd/LicenseText.hpp"
-#include "hcd/WarrantyText.hpp"
 
 using namespace std::string_literals;
 
@@ -56,26 +54,6 @@ int main(int argc, char **argv)
 				std::exit(0);
 			},
 			Lm::Locale::Get("HELP_VERSION_DESCRIPTION")
-		},
-		{
-			"license",
-			Lm::Opt::Option::noShortOption,
-			Lm::Opt::Option::Argument::None,
-			[](const std::string &) {
-				fmt::print("{}\n", Lm::licenseText);
-				std::exit(0);
-			},
-			Lm::Locale::Get("HELP_LICENSE_DESCRIPTION")
-		},
-		{
-			"warranty",
-			Lm::Opt::Option::noShortOption,
-			Lm::Opt::Option::Argument::None,
-			[](const std::string &) {
-				fmt::print("{}\n", Lm::warrantyText);
-				std::exit(0);
-			},
-			Lm::Locale::Get("HELP_WARRANTY_DESCRIPTION")
 		},
 		{
 			"locale",

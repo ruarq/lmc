@@ -1,4 +1,6 @@
 ERROR													Fehler
+FATAL_ERROR												fataler Fehler
+
 USAGE_STRING											Aufruf: {} [Optionen] Datei...
 OPTIONS													Optionen
 
@@ -7,7 +9,5 @@ LEXER_ERROR_UNTERMINATED_STRING							String wurde nicht terminiert
 LEXER_ERROR_UNTERMINATED_CHAR							Char wurde nicht terminiert
 
 HELP_VERSION_DESCRIPTION								Compilerversioninformationen anzeigen
-HELP_LICENSE_DESCRIPTION								Compilerlizenzinformationen anzeigen
-HELP_WARRANTY_DESCRIPTION								Compilergarantieinformationen anzeigen
 HELP_LOCALE_DESCRIPTION									Die genutzte Lokalisierung anzeigen
 HELP_HELP_DESCRIPTION									Diese Informationen anzeigen

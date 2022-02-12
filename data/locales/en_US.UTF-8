@@ -9,7 +9,5 @@ LEXER_ERROR_UNTERMINATED_STRING							missing terminating "
 LEXER_ERROR_UNTERMINATED_CHAR							missing terminating '
 
 HELP_VERSION_DESCRIPTION								Get the version of lmc you're using
-HELP_LICENSE_DESCRIPTION								Show the license lmc is using
-HELP_WARRANTY_DESCRIPTION								Show warranty
 HELP_LOCALE_DESCRIPTION									Get the locale used by lmc
 HELP_HELP_DESCRIPTION									Show this information
