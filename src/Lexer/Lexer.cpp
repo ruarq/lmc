@@ -31,7 +31,7 @@ namespace Lm
 auto Lexer::Run(const File &file) -> std::vector<Token>
 {
 	this->file = &file;
-	pos = { 0, 0 };
+	pos = { 1, 0 };
 	current = 0;
 
 	std::vector<Token> tokens;

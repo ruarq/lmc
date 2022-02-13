@@ -99,7 +99,15 @@ int main(int argc, char **argv)
 
 		for (const auto &token : tokens)
 		{
-			fmt::print("{:3} {:4}\n", (std::uint32_t)(token.type), token.literal);
+			if (token.type == Lm::Token::Type::Unknown)
+			{
+				fmt::print("{}: {}:{}:{}: Unknown token '{}'\n",
+					argv[0],
+					file.name,
+					token.start.line,
+					token.start.column,
+					token.literal);
+			}
 		}
 	}
 
