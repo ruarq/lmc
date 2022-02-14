@@ -31,6 +31,8 @@
 #include <fmt/format.h>
 
 #include "../File.hpp"
+#include "../Localization/Locale.hpp"
+#include "../Logger.hpp"
 #include "Token.hpp"
 
 namespace Lm
@@ -43,6 +45,11 @@ public:
 	 * @brief Run the lexer over a source
 	 */
 	auto Run(const File &file) -> std::vector<Token>;
+
+	/**
+	 * @return True if the lexer had an error, false if not
+	 */
+	auto HadError() const -> bool;
 
 private:
 	/**
@@ -91,10 +98,22 @@ private:
 	 */
 	auto Eof() const -> bool;
 
+	/**
+	 * @brief Call if the lexer encounters something unexpected
+	 */
+	template<typename... Args>
+	auto Error(const FileLoc &where, const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	{
+		hadError = true;
+		Logger::ErrorFile(file->name, where, fmt, args...);
+	}
+
 private:
 	const File *file;
 	FileLoc pos;
 	size_t current;
+
+	bool hadError = false;
 };
 
 }

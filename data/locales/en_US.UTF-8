@@ -1,3 +1,5 @@
+INFO													info
+WARNING													warning
 ERROR													error
 FATAL_ERROR												fatal error
 

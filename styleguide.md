@@ -15,3 +15,6 @@ auto PascalCase() -> int
 
 const int camelCase = 42;
 ```
+
+## Other
+- Prefer `const std::string &` over `std::string_view`

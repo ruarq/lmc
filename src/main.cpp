@@ -30,6 +30,7 @@
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
+#include "Logger.hpp"
 #include "Opt/Parse.hpp"
 
 using namespace std::string_literals;
@@ -97,15 +98,18 @@ int main(int argc, char **argv)
 		Lm::Lexer lexer;
 		const auto tokens = lexer.Run(file);
 
+		if (lexer.HadError())
+		{
+			return 1;
+		}
+
 		for (const auto &token : tokens)
 		{
 			if (token.type == Lm::Token::Type::Unknown)
 			{
-				fmt::print("{}: {}:{}:{}: Unknown token '{}'\n",
-					argv[0],
-					file.name,
-					token.start.line,
-					token.start.column,
+				Lm::Logger::ErrorFile(file.name,
+					token.start,
+					Lm::Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"),
 					token.literal);
 			}
 		}

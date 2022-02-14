@@ -25,6 +25,8 @@
 
 #include "Locale.hpp"
 
+#include "../Logger.hpp"
+
 namespace Lm
 {
 
@@ -99,7 +101,7 @@ auto Locale::LoadFromFile(const std::string &filename) -> bool
 
 auto Locale::Get(const std::string &phrase) -> const std::string &
 {
-#if defined(DEBUG)
+#ifdef DEBUG
 	if (phrases.find(phrase) == phrases.end())
 	{
 		LM_DEBUG("No such key '{}' in phrases", phrase);
