@@ -134,12 +134,13 @@ public:
 	};
 
 public:
-	Token(const Type type, const std::string &literal, const FileLoc &start, const FileLoc &end);
+	Token(const Type type, const std::string &literal, const FileLoc &start, const size_t offset);
 
 public:
 	const Type type;			  ///< The type of the token
 	const std::string literal;	  ///< The literal of the token
-	const FileLoc start, end;	  ///< Start and end locations of the literal
+	const FileLoc start;		  ///< Start location of the literal
+	const size_t offset;		  ///< Location as offset in bytes from the start of the file
 };
 
 }

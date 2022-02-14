@@ -74,8 +74,15 @@ private:
 
 	/**
 	 * @brief Skip whitespace
+	 * @return True if whitespace was skipped
 	 */
-	auto SkipWhitespace() -> void;
+	auto SkipWhitespace() -> bool;
+
+	/**
+	 * @brief Skip comments
+	 * @return True if a comment was skipped
+	 */
+	auto SkipComments() -> bool;
 
 	/**
 	 * @brief Get the current char
@@ -102,10 +109,36 @@ private:
 	 * @brief Call if the lexer encounters something unexpected
 	 */
 	template<typename... Args>
-	auto Error(const FileLoc &where, const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	auto Error(const FileLoc &where, const size_t offset, const fmt::format_string<Args...> &fmt, Args &&...args)
+		-> void
 	{
 		hadError = true;
 		Logger::ErrorFile(file->name, where, fmt, args...);
+
+		const auto lineStart = file->content.rfind('\n', offset) + 1;
+		const auto lineEnd = file->content.find('\n', lineStart + 1);
+		const std::string line = file->content.substr(lineStart, lineEnd - lineStart);
+
+		fmt::print("{}\n", line);
+		for (size_t i = 0; i < line.size(); ++i)
+		{
+			if (line[i] != '\t')
+			{
+				if (i == where.column)
+				{
+					fmt::print("^");
+				}
+				else
+				{
+					fmt::print("~");
+				}
+			}
+			else
+			{
+				fmt::print("\t");
+			}
+		}
+		fmt::print("\n");
 	}
 
 private:

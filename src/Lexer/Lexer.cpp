@@ -52,16 +52,21 @@ auto Lexer::HadError() const -> bool
 auto Lexer::NextToken() -> Token
 {
 	auto SingleToken = [&](const Token::Type type) {
-		return Token(type, { Consume() }, pos, { pos.line, pos.column + 1 });
+		return Token(type, { Consume() }, pos, current);
 	};
 
 	auto MultiToken = [&](const Token::Type type, const size_t size) {
-		const auto start = current;
-		current += size;
-		return Token(type, std::string(file->content, start, size), pos, { pos.line, pos.column + 1 });
+		std::string literal;
+		for (size_t i = 0; i < size; ++i)
+		{
+			literal += Consume();
+		}
+		return Token(type, std::string(literal), pos, current);
 	};
 
-	SkipWhitespace();
+	while (SkipWhitespace() || SkipComments())
+		;
+
 	if (Eof())
 	{
 		return SingleToken(Token::Type::Eof);
@@ -80,16 +85,17 @@ auto Lexer::NextToken() -> Token
 		case '\'':
 		{
 			const auto start = pos;
+			const auto offset = current;
 			Consume();
 			const std::string literal { Consume() };
 
 			if (Current() != '\'')
 			{
-				Error(pos, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
+				Error(pos, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
 			}
 
 			Consume(/* '\'' */);
-			return Token(Token::Type::CharLiteral, literal, start, pos);
+			return Token(Token::Type::CharLiteral, literal, start, current);
 		}
 
 		case '(': return SingleToken(Token::Type::LParen);
@@ -234,7 +240,7 @@ auto Lexer::NextToken() -> Token
 			return SingleToken(Token::Type::Flip);
 
 		default:
-			Error(pos, Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), currentChar);
+			Error(pos, current, Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), currentChar);
 			return SingleToken(Token::Type::Unknown);
 	}
 }
@@ -580,7 +586,7 @@ auto Lexer::Identifier() -> Token
 		literal += Consume();
 	}
 
-	return Token(GetKeywordType(literal), literal, start, pos);
+	return Token(GetKeywordType(literal), literal, start, current);
 }
 
 auto Lexer::Number() -> Token
@@ -608,40 +614,60 @@ auto Lexer::Number() -> Token
 		}
 	}
 
-	return Token(type, literal, start, pos);
+	return Token(type, literal, start, current);
 }
 
 auto Lexer::String() -> Token
 {
 	const auto start = pos;
+	const auto offset = current;
 	const auto quote = Consume();
 
 	std::string literal;
-	while (!Eof() && Current() != quote)
+	while (!Eof() && Current() != quote && Current() != '\n')
 	{
 		literal += Consume();
 	}
 
 	if (Current() != '"')
 	{
-		Error(start, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
+		Error(start, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
 	}
 
 	Consume();
 
-	return Token(Token::Type::StringLiteral, literal, start, pos);
+	return Token(Token::Type::StringLiteral, literal, start, current);
 }
 
-auto Lexer::SkipWhitespace() -> void
+auto Lexer::SkipWhitespace() -> bool
 {
 	auto IsWhitespace = [](const char &c) {
 		return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
 	};
 
+	bool skipped = false;
 	while (IsWhitespace(Current()))
 	{
+		skipped = true;
 		Consume();
 	}
+
+	return skipped;
+}
+
+auto Lexer::SkipComments() -> bool
+{
+	if (Current() == '#')
+	{
+		while (!Eof() && Current() != '\n')
+		{
+			Consume();
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 auto Lexer::Current() const -> char

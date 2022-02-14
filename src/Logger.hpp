@@ -83,8 +83,8 @@ public:
 	WarningFile(const std::string &filename, const FileLoc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
 		-> void
 	{
-		Warning("{}: {}",
-			fmt::format(fileEmphasis, "{}:{}:{}", filename, pos.line, pos.column),
+		Warning("{} {}",
+			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),
 			fmt::format(fmt, args...));
 	}
 
@@ -101,8 +101,8 @@ public:
 	ErrorFile(const std::string &filename, const FileLoc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
 		-> void
 	{
-		Error("{}: {}",
-			fmt::format(fileEmphasis, "{}:{}:{}", filename, pos.line, pos.column),
+		Error("{} {}",
+			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),
 			fmt::format(fmt, args...));
 	}
 
