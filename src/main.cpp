@@ -102,17 +102,6 @@ int main(int argc, char **argv)
 		{
 			return 1;
 		}
-
-		for (const auto &token : tokens)
-		{
-			if (token.type == Lm::Token::Type::Unknown)
-			{
-				Lm::Logger::ErrorFile(file.name,
-					token.start,
-					Lm::Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"),
-					token.literal);
-			}
-		}
 	}
 
 	return 0;
