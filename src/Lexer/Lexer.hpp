@@ -115,30 +115,26 @@ private:
 		hadError = true;
 		Logger::ErrorFile(file->name, where, fmt, args...);
 
+		// TODO(ruarq): Improve this section if possible
+		const auto color = fmt::color::yellow_green;
+
 		const auto lineStart = file->content.rfind('\n', offset) + 1;
 		const auto lineEnd = file->content.find('\n', lineStart + 1);
 		const std::string line = file->content.substr(lineStart, lineEnd - lineStart);
 
 		fmt::print("{}\n", line);
-		for (size_t i = 0; i < line.size(); ++i)
+		for (size_t i = 0; i < where.column; ++i)
 		{
 			if (line[i] != '\t')
 			{
-				if (i == where.column)
-				{
-					fmt::print("^");
-				}
-				else
-				{
-					fmt::print("~");
-				}
+				fmt::print(" ");
 			}
 			else
 			{
 				fmt::print("\t");
 			}
 		}
-		fmt::print("\n");
+		fmt::print(fg(color), "^\n");
 	}
 
 private:
