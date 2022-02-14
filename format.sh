@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "==== formatting with clang-format ===="
+
 files=$(find src -type f -regex ".*\..pp")
 num_files=$(echo "$files" | wc -l)
 i=1

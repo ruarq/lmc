@@ -89,6 +89,7 @@ public:
 		RShift,			 ///< >>
 		RShiftEqual,	 ///< >>=
 		Cast,			 ///< $
+		Attribute,		 ///< @
 
 		Fn,			 ///< fn
 		Mut,		 ///< mut

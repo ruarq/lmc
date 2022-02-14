@@ -106,6 +106,7 @@ auto Lexer::NextToken() -> Token
 		case ',': return SingleToken(Token::Type::Comma);
 		case ';': return SingleToken(Token::Type::Semicolon);
 		case '$': return SingleToken(Token::Type::Cast);
+		case '@': return SingleToken(Token::Type::Attribute);
 
 		case '-':
 			if (Match("->"))

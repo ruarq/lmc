@@ -23,8 +23,11 @@
  * IN THE SOFTWARE.
  */
 
+#include <chrono>
 #include <string>
+#include <vector>
 
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include "File.hpp"
@@ -89,14 +92,48 @@ int main(int argc, char **argv)
 	// Generate help text
 	helpText = Lm::Opt::GenerateHelpText(options);
 
-	const auto filenames = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
+	auto RemoveDups = [](auto &list) {
+		const auto copy = std::move(list);
+
+		for (auto &elem : copy)
+		{
+			bool insert = true;
+			for (auto &item : list)
+			{
+				if (item == elem)
+				{
+					insert = false;
+					break;
+				}
+			}
+
+			if (insert)
+			{
+				list.push_back(std::move(elem));
+			}
+		}
+	};
+
+	auto filenames = Lm::Opt::Parse(std::vector<std::string>(argv, argv + argc), options);
+	RemoveDups(filenames);
+
+	LM_DEBUG("Discovering {} file(s)...", filenames.size());
 
 	for (const auto &filename : filenames)
 	{
+		LM_DEBUG("Lexing through '{}'", filename);
 		const Lm::File file(filename);
 
 		Lm::Lexer lexer;
+
+		LM_DEBUG_ONLY(auto lexingStart = std::chrono::high_resolution_clock::now();)
 		const auto tokens = lexer.Run(file);
+		LM_DEBUG_ONLY(auto lexingEnd = std::chrono::high_resolution_clock::now();)
+
+		LM_DEBUG("Read {} tokens from '{}' in {}",
+			tokens.size(),
+			file.name,
+			std::chrono::duration<double>(lexingEnd - lexingStart));
 
 		if (lexer.HadError())
 		{

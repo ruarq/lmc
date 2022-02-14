@@ -17,11 +17,6 @@ else
 	config="debug"
 fi
 
-# format the source code
-echo "==== formatting with clang-format ===="
-./format.sh
-
-echo ""
 echo "==== generating make files ===="
 
 # run premake5

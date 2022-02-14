@@ -34,9 +34,11 @@
 #include "Localization/Locale.hpp"
 
 #ifdef DEBUG
-	#define LM_DEBUG(fmt, ...) Logger::Debug(fmt, __VA_ARGS__)
+	#define LM_DEBUG(fmt, ...) Lm::Logger::Debug(fmt, __VA_ARGS__)
+	#define LM_DEBUG_ONLY(x) x
 #else
 	#define LM_DEBUG(fmt, ...)
+	#define LM_DEBUG_ONLY(x)
 #endif
 
 namespace Lm
