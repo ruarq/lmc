@@ -86,15 +86,13 @@ auto Lexer::NextToken() -> Token
 		{
 			const auto start = pos;
 			const auto offset = current;
+
 			Consume();
 			const std::string literal { Consume() };
-
-			if (Current() != '\'')
+			if (Consume() != '\'')
 			{
-				Error(pos, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
+				Error(start, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
 			}
-
-			Consume(/* '\'' */);
 			return Token(Token::Type::CharLiteral, literal, start, current);
 		}
 
@@ -621,10 +619,10 @@ auto Lexer::String() -> Token
 {
 	const auto start = pos;
 	const auto offset = current;
-	const auto quote = Consume();
 
+	Consume();
 	std::string literal;
-	while (!Eof() && Current() != quote && Current() != '\n')
+	while (!Eof() && Current() != '"' && Current() != '\n')
 	{
 		literal += Consume();
 	}
