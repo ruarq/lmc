@@ -28,6 +28,7 @@
 #include <string>
 
 #include "../File.hpp"
+#include "../SymbolPool.hpp"
 
 namespace Lm
 {
@@ -38,12 +39,6 @@ namespace Lm
 class Token final
 {
 public:
-	struct Loc final
-	{
-		File::Loc start, end;
-		size_t offset;
-	};
-
 	/**
 	 * @brief defines the type of a token
 	 */
@@ -99,7 +94,7 @@ public:
 
 		Fn,			 ///< fn
 		Mut,		 ///< mut
-		Imut,		 ///< imut
+		Let,		 ///< let
 		Ret,		 ///< ret
 		Module,		 ///< module
 		Import,		 ///< import
@@ -141,12 +136,12 @@ public:
 	};
 
 public:
-	Token(const Type type, const std::string &literal, const Loc loc);
+	Token(const Type type, std::string &&literal, const File::Loc loc);
 
 public:
-	const Type type;			  ///< The type of the token
-	const std::string literal;	  ///< The literal of the token
-	const Loc loc;
+	const Type type;		 ///< The type of the token
+	const Symbol literal;	 ///< The literal of the token
+	const File::Loc loc;
 };
 
 }

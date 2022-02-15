@@ -52,7 +52,7 @@ auto Lexer::HadError() const -> bool
 auto Lexer::NextToken() -> Token
 {
 	auto SingleToken = [&](const Token::Type type) {
-		const Token::Loc loc {
+		const File::Loc loc {
 			.start = pos,
 			.end = {pos.line, pos.column + 1},
 			.offset = current
@@ -63,7 +63,7 @@ auto Lexer::NextToken() -> Token
 	auto MultiToken = [&](const Token::Type type, const size_t size) {
 		std::string literal;
 
-		Token::Loc loc;
+		File::Loc loc;
 		loc.start = pos;
 		loc.offset = current;
 
@@ -97,12 +97,12 @@ auto Lexer::NextToken() -> Token
 		case '"': return String();
 		case '\'':
 		{
-			Token::Loc loc;
+			File::Loc loc;
 			loc.start = pos;
 			loc.offset = current;
 
 			Consume();
-			const std::string literal { Consume() };
+			std::string literal { Consume() };
 			if (Consume() != '\'')
 			{
 				Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
@@ -110,7 +110,7 @@ auto Lexer::NextToken() -> Token
 
 			loc.end = pos;
 
-			return Token(Token::Type::CharLiteral, literal, loc);
+			return Token(Token::Type::CharLiteral, std::move(literal), loc);
 		}
 
 		case '(': return SingleToken(Token::Type::LParen);
@@ -380,13 +380,6 @@ auto Lexer::Identifier() -> Token
 								}
 								return Token::Type::Ident;
 
-							case 'u':
-								if (Match("ut", 2))
-								{
-									return Token::Type::Imut;
-								}
-								return Token::Type::Ident;
-
 							default: return Token::Type::Ident;
 						}
 
@@ -474,6 +467,13 @@ auto Lexer::Identifier() -> Token
 
 				switch (ident.at(1))
 				{
+					case 'e':
+						if (Match("t", 2))
+						{
+							return Token::Type::Let;
+						}
+						return Token::Type::Ident;
+
 					case 'o':
 						if (ident.size() <= 2)
 						{
@@ -595,7 +595,7 @@ auto Lexer::Identifier() -> Token
 		}
 	};
 
-	Token::Loc loc;
+	File::Loc loc;
 	loc.start = pos;
 	loc.offset = current;
 
@@ -607,7 +607,7 @@ auto Lexer::Identifier() -> Token
 
 	loc.end = pos;
 
-	return Token(GetKeywordType(literal), literal, loc);
+	return Token(GetKeywordType(literal), std::move(literal), loc);
 }
 
 auto Lexer::Number() -> Token
@@ -616,7 +616,7 @@ auto Lexer::Number() -> Token
 		return c >= '0' && c <= '9';
 	};
 
-	Token::Loc loc;
+	File::Loc loc;
 	loc.start = pos;
 	loc.offset = current;
 
@@ -640,12 +640,12 @@ auto Lexer::Number() -> Token
 
 	loc.end = pos;
 
-	return Token(type, literal, loc);
+	return Token(type, std::move(literal), loc);
 }
 
 auto Lexer::String() -> Token
 {
-	Token::Loc loc;
+	File::Loc loc;
 	loc.start = pos;
 	loc.offset = current;
 
@@ -665,7 +665,7 @@ auto Lexer::String() -> Token
 
 	loc.end = pos;
 
-	return Token(Token::Type::StringLiteral, literal, loc);
+	return Token(Token::Type::StringLiteral, std::move(literal), loc);
 }
 
 auto Lexer::SkipWhitespace() -> bool

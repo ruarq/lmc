@@ -80,7 +80,7 @@ public:
 
 	template<typename... Args>
 	static auto WarningFile(const std::string &filename,
-		const File::Loc &pos,
+		const File::Pos &pos,
 		const fmt::format_string<Args...> &fmt,
 		Args &&...args) -> void
 	{
@@ -99,7 +99,7 @@ public:
 
 	template<typename... Args>
 	static auto
-	ErrorFile(const std::string &filename, const File::Loc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
+	ErrorFile(const std::string &filename, const File::Pos &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
 		-> void
 	{
 		Error("{} {}",

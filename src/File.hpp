@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <fstream>
+#include <cstdio>
 #include <string>
 
 namespace Lm
@@ -37,10 +37,17 @@ namespace Lm
 class File final
 {
 public:
-	struct Loc final
+	struct Pos final
 	{
 		size_t line;
 		size_t column;
+	};
+
+	struct Loc final
+	{
+		Pos start;
+		Pos end;
+		size_t offset;
 	};
 
 public:

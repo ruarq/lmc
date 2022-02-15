@@ -109,7 +109,7 @@ private:
 	 * @brief Call if the lexer encounters something unexpected
 	 */
 	template<typename... Args>
-	auto Error(const File::Loc &where, const size_t offset, const fmt::format_string<Args...> &fmt, Args &&...args)
+	auto Error(const File::Pos &where, const size_t offset, const fmt::format_string<Args...> &fmt, Args &&...args)
 		-> void
 	{
 		hadError = true;
@@ -139,7 +139,7 @@ private:
 
 private:
 	const File *file;
-	File::Loc pos;
+	File::Pos pos;
 	size_t current;
 
 	bool hadError = false;

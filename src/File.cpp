@@ -25,24 +25,31 @@
 
 #include "File.hpp"
 
+#include "Logger.hpp"
+
 namespace Lm
 {
 
 File::File(const std::string &filename)
 	: name(filename)
 {
-	std::ifstream file(filename);
-	if (!file.is_open())
+	std::FILE *file = fopen(filename.c_str(), "r");
+	if (!file)
 	{
+		LM_DEBUG("Couldn't open file '{}'", filename);
 		return;
 	}
 
-	// TODO(ruarq): Faster solution
-	std::string line;
-	while (std::getline(file, line))
-	{
-		content += line + std::string("\n");
-	}
+	fseek(file, 0, SEEK_END);
+	const auto fileSize = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	content = std::string(fileSize, 0);
+
+	const auto bytesRead = fread(content.data(), sizeof(char), fileSize, file);
+	LM_DEBUG("Read {} bytes from '{}'", bytesRead, filename);
+
+	fclose(file);
 }
 
 }
