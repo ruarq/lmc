@@ -35,6 +35,8 @@
 #include "Localization/Locale.hpp"
 #include "Logger.hpp"
 #include "Opt/Parse.hpp"
+#include "Parser/Parser.hpp"
+#include "Tools.hpp"
 
 using namespace std::string_literals;
 
@@ -124,11 +126,14 @@ int main(int argc, char **argv)
 		LM_DEBUG("Lexing through '{}'", filename);
 		const Lm::File file(filename);
 
+		/**
+		 * Lexing
+		 */
 		Lm::Lexer lexer;
 
-		LM_DEBUG_ONLY(auto lexingStart = std::chrono::high_resolution_clock::now();)
+		LM_IGNORE_IN_RELEASE(auto lexingStart = std::chrono::high_resolution_clock::now();)
 		const auto tokens = lexer.Run(file);
-		LM_DEBUG_ONLY(auto lexingEnd = std::chrono::high_resolution_clock::now();)
+		LM_IGNORE_IN_RELEASE(auto lexingEnd = std::chrono::high_resolution_clock::now();)
 
 		LM_DEBUG("Read {} tokens from '{}' in {}",
 			tokens.size(),
@@ -139,6 +144,12 @@ int main(int argc, char **argv)
 		{
 			return 1;
 		}
+
+		/**
+		 * Parsing
+		 */
+		Lm::Parser parser;
+		auto translationUnit = parser.Run(tokens);
 	}
 
 	return 0;

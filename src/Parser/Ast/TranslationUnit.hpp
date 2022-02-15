@@ -27,21 +27,15 @@
 
 #include <vector>
 
-#include "../Lexer/Token.hpp"
-#include "../Logger.hpp"
-#include "../Tools.hpp"
-#include "Ast/Node.hpp"
+#include "Node.hpp"
 
-namespace Lm
+namespace Lm::Ast
 {
 
-class Parser final
+class TranslationUnit final : public Node
 {
 public:
-	auto Run(const std::vector<Token> &tokens) -> Ast::Node *;
-
-private:
-	const std::vector<Token> *tokens;
+	std::vector</* Some DeclarationStatement type */ int> statements;
 };
 
 }

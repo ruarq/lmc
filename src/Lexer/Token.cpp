@@ -28,11 +28,10 @@
 namespace Lm
 {
 
-Token::Token(const Type type, const std::string &literal, const FileLoc &start, const size_t offset)
+Token::Token(const Type type, const std::string &literal, const Loc loc)
 	: type(type)
 	, literal(literal)
-	, start(start)
-	, offset(offset)
+	, loc(loc)
 {
 }
 

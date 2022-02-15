@@ -23,25 +23,15 @@
  * IN THE SOFTWARE.
  */
 
-#pragma once
-
-#include <vector>
-
-#include "../Lexer/Token.hpp"
-#include "../Logger.hpp"
-#include "../Tools.hpp"
-#include "Ast/Node.hpp"
+#include "Parser.hpp"
 
 namespace Lm
 {
 
-class Parser final
+auto Parser::Run(const std::vector<Token> &tokens) -> Ast::Node *
 {
-public:
-	auto Run(const std::vector<Token> &tokens) -> Ast::Node *;
-
-private:
-	const std::vector<Token> *tokens;
-};
+	this->tokens = &tokens;
+	return nullptr;
+}
 
 }

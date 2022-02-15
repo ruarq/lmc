@@ -35,10 +35,8 @@
 
 #ifdef DEBUG
 	#define LM_DEBUG(fmt, ...) Lm::Logger::Debug(fmt, __VA_ARGS__)
-	#define LM_DEBUG_ONLY(x) x
 #else
 	#define LM_DEBUG(fmt, ...)
-	#define LM_DEBUG_ONLY(x)
 #endif
 
 namespace Lm
@@ -81,9 +79,10 @@ public:
 	}
 
 	template<typename... Args>
-	static auto
-	WarningFile(const std::string &filename, const FileLoc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
-		-> void
+	static auto WarningFile(const std::string &filename,
+		const File::Loc &pos,
+		const fmt::format_string<Args...> &fmt,
+		Args &&...args) -> void
 	{
 		Warning("{} {}",
 			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),
@@ -100,7 +99,7 @@ public:
 
 	template<typename... Args>
 	static auto
-	ErrorFile(const std::string &filename, const FileLoc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
+	ErrorFile(const std::string &filename, const File::Loc &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
 		-> void
 	{
 		Error("{} {}",

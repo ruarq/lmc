@@ -38,6 +38,12 @@ namespace Lm
 class Token final
 {
 public:
+	struct Loc final
+	{
+		File::Loc start, end;
+		size_t offset;
+	};
+
 	/**
 	 * @brief defines the type of a token
 	 */
@@ -135,13 +141,12 @@ public:
 	};
 
 public:
-	Token(const Type type, const std::string &literal, const FileLoc &start, const size_t offset);
+	Token(const Type type, const std::string &literal, const Loc loc);
 
 public:
 	const Type type;			  ///< The type of the token
 	const std::string literal;	  ///< The literal of the token
-	const FileLoc start;		  ///< Start location of the literal
-	const size_t offset;		  ///< Location as offset in bytes from the start of the file
+	const Loc loc;
 };
 
 }

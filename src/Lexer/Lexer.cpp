@@ -52,16 +52,29 @@ auto Lexer::HadError() const -> bool
 auto Lexer::NextToken() -> Token
 {
 	auto SingleToken = [&](const Token::Type type) {
-		return Token(type, { Consume() }, pos, current);
+		const Token::Loc loc {
+			.start = pos,
+			.end = {pos.line, pos.column + 1},
+			.offset = current
+		};
+		return Token(type, { Consume() }, loc);
 	};
 
 	auto MultiToken = [&](const Token::Type type, const size_t size) {
 		std::string literal;
+
+		Token::Loc loc;
+		loc.start = pos;
+		loc.offset = current;
+
 		for (size_t i = 0; i < size; ++i)
 		{
 			literal += Consume();
 		}
-		return Token(type, std::string(literal), pos, current);
+
+		loc.end = pos;
+
+		return Token(type, std::string(literal), loc);
 	};
 
 	while (SkipWhitespace() || SkipComments())
@@ -84,16 +97,20 @@ auto Lexer::NextToken() -> Token
 		case '"': return String();
 		case '\'':
 		{
-			const auto start = pos;
-			const auto offset = current;
+			Token::Loc loc;
+			loc.start = pos;
+			loc.offset = current;
 
 			Consume();
 			const std::string literal { Consume() };
 			if (Consume() != '\'')
 			{
-				Error(start, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
+				Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
 			}
-			return Token(Token::Type::CharLiteral, literal, start, current);
+
+			loc.end = pos;
+
+			return Token(Token::Type::CharLiteral, literal, loc);
 		}
 
 		case '(': return SingleToken(Token::Type::LParen);
@@ -578,14 +595,19 @@ auto Lexer::Identifier() -> Token
 		}
 	};
 
+	Token::Loc loc;
+	loc.start = pos;
+	loc.offset = current;
+
 	std::string literal;
-	const auto start = pos;
 	while (IsIdent(Current()))
 	{
 		literal += Consume();
 	}
 
-	return Token(GetKeywordType(literal), literal, start, current);
+	loc.end = pos;
+
+	return Token(GetKeywordType(literal), literal, loc);
 }
 
 auto Lexer::Number() -> Token
@@ -594,9 +616,12 @@ auto Lexer::Number() -> Token
 		return c >= '0' && c <= '9';
 	};
 
+	Token::Loc loc;
+	loc.start = pos;
+	loc.offset = current;
+
 	std::string literal;
 	auto type = Token::Type::Int32Literal;
-	const auto start = pos;
 
 	while (IsNumber(Current()))
 	{
@@ -613,13 +638,16 @@ auto Lexer::Number() -> Token
 		}
 	}
 
-	return Token(type, literal, start, current);
+	loc.end = pos;
+
+	return Token(type, literal, loc);
 }
 
 auto Lexer::String() -> Token
 {
-	const auto start = pos;
-	const auto offset = current;
+	Token::Loc loc;
+	loc.start = pos;
+	loc.offset = current;
 
 	Consume();
 	std::string literal;
@@ -630,12 +658,14 @@ auto Lexer::String() -> Token
 
 	if (Current() != '"')
 	{
-		Error(start, offset, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
+		Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
 	}
 
 	Consume();
 
-	return Token(Token::Type::StringLiteral, literal, start, current);
+	loc.end = pos;
+
+	return Token(Token::Type::StringLiteral, literal, loc);
 }
 
 auto Lexer::SkipWhitespace() -> bool

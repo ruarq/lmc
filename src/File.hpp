@@ -37,6 +37,13 @@ namespace Lm
 class File final
 {
 public:
+	struct Loc final
+	{
+		size_t line;
+		size_t column;
+	};
+
+public:
 	/**
 	 * @brief Load from file
 	 * @param filename The name of the file
@@ -46,15 +53,6 @@ public:
 public:
 	std::string name;
 	std::string content;
-};
-
-/**
- * @brief Store a location in a file
- */
-struct FileLoc final
-{
-	size_t line = 0;
-	size_t column = 0;
 };
 
 }
