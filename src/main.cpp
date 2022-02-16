@@ -124,6 +124,7 @@ int main(int argc, char **argv)
 	for (const auto &filename : filenames)
 	{
 		Lm::File file(filename);
+		const std::string content = file.Read();
 
 		/**
 		 * Lexing
@@ -131,20 +132,19 @@ int main(int argc, char **argv)
 		Lm::Lexer lexer;
 
 		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
-		const auto tokens = lexer.Run(file.name, file.Read());
-		LM_IGNORE_IN_RELEASE(const auto lexingEnd = std::chrono::high_resolution_clock::now();
-							 const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
+		const auto tokens = lexer.Run(content.data(), content.data() + content.size());
+		LM_IGNORE_IN_RELEASE(
+			const auto lexingEnd = std::chrono::high_resolution_clock::now();
+			const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
 
-		LM_DEBUG("{}: - {} tokens - {} - {:.2f} MiB/s",
-			file.name,
+		Lm::Symbol::DropHashmap();
+
+		LM_DEBUG("{}: - {} token(s) - {} - {:.2f} MiB/s",
+			file.Name(),
 			tokens.size(),
 			duration,
-			(double)(file.size) / (duration.count() * 1048576.0));	  // Conversion from B/s to MiB/s
-
-		if (lexer.HadError())
-		{
-			return 1;
-		}
+			(double)(file.Size()) /
+				(duration.count() * 1048576.0));	// Conversion from B/s to MiB/s
 
 		/**
 		 * Parsing

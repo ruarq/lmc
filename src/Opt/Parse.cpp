@@ -32,7 +32,8 @@ using namespace std::string_literals;
 namespace Lm::Opt
 {
 
-auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options) -> std::vector<std::string>
+auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &options)
+	-> std::vector<std::string>
 {
 	std::vector<std::string> nonOptions;
 
@@ -47,7 +48,9 @@ auto Parse(const std::vector<std::string> &argv, const std::vector<Option> &opti
 	return nonOptions;
 }
 
-auto ParseOption(const std::vector<std::string> &argv, size_t &arg, const std::vector<Option> &options) -> bool
+auto ParseOption(const std::vector<std::string> &argv,
+	size_t &arg,
+	const std::vector<Option> &options) -> bool
 {
 	bool optionNotFound = true;
 	const std::string argString = argv.at(arg);

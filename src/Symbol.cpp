@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 12.02.2022 
+ * @date 16.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,49 +23,44 @@
  * IN THE SOFTWARE.
  */
 
-#include "File.hpp"
-
-#include "Logger.hpp"
+#include "Symbol.hpp"
 
 namespace Lm
 {
 
-File::File(const std::string &filename)
-	: name(filename)
+std::vector<std::string> Symbol::pool;
+std::unordered_map<std::string, symbol_id_t> Symbol::stringToId;
+
+auto Symbol::NextId() -> symbol_id_t
 {
-	file = fopen(filename.c_str(), "r");
-	if (!file)
+	static symbol_id_t nextId = 0;
+	return nextId++;
+}
+
+auto Symbol::DropHashmap() -> void
+{
+	stringToId.clear();
+}
+
+Symbol::Symbol(std::string &&str)
+{
+	operator=(std::move(str));
+}
+
+auto Symbol::operator=(std::string &&str) -> Symbol &
+{
+	if (stringToId.find(str) == stringToId.end())
 	{
-		LM_DEBUG("Couldn't open file '{}'", filename);
-		return;
+		id = NextId();
+		stringToId[str] = id;
+		pool.push_back(std::move(str));
+	}
+	else
+	{
+		id = stringToId.at(str);
 	}
 
-	fseek(file, 0, SEEK_END);
-	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-}
-
-File::~File()
-{
-	fclose(file);
-}
-
-auto File::Read() const -> std::string
-{
-	std::string content(size + 1, '\0');
-	content.back() = '\n';
-	fread(content.data(), sizeof(char), size, file);
-	return content;
-}
-
-auto File::Name() const -> std::string
-{
-	return name;
-}
-
-auto File::Size() const -> size_t
-{
-	return size;
+	return *this;
 }
 
 }

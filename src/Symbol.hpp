@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 12.02.2022 
+ * @date 16.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,49 +23,36 @@
  * IN THE SOFTWARE.
  */
 
-#include "File.hpp"
+#pragma once
 
-#include "Logger.hpp"
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace Lm
 {
 
-File::File(const std::string &filename)
-	: name(filename)
-{
-	file = fopen(filename.c_str(), "r");
-	if (!file)
-	{
-		LM_DEBUG("Couldn't open file '{}'", filename);
-		return;
-	}
+using symbol_id_t = unsigned long;
 
-	fseek(file, 0, SEEK_END);
-	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-}
-
-File::~File()
+class Symbol final
 {
-	fclose(file);
-}
+public:
+	static auto NextId() -> symbol_id_t;
+	static auto DropHashmap() -> void;
 
-auto File::Read() const -> std::string
-{
-	std::string content(size + 1, '\0');
-	content.back() = '\n';
-	fread(content.data(), sizeof(char), size, file);
-	return content;
-}
+public:
+	static std::vector<std::string> pool;
+	static std::unordered_map<std::string, symbol_id_t> stringToId;
 
-auto File::Name() const -> std::string
-{
-	return name;
-}
+public:
+	Symbol() = default;
+	Symbol(std::string &&str);
 
-auto File::Size() const -> size_t
-{
-	return size;
-}
+public:
+	auto operator=(std::string &&str) -> Symbol &;
+
+private:
+	symbol_id_t id;
+};
 
 }

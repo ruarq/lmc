@@ -64,12 +64,13 @@ public:
 	 */
 	auto Read() const -> std::string;
 
-public:
-	std::string name;
-	size_t size;
+	auto Name() const -> std::string;
+	auto Size() const -> size_t;
 
 private:
 	FILE *file;
+	std::string name;
+	size_t size;
 };
 
 }

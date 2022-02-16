@@ -28,710 +28,299 @@
 namespace Lm
 {
 
-auto Lexer::Run(const std::string &filename, std::string &&source) -> std::vector<Token>
+auto Lexer::Run(const char *source_, const char *end_) -> std::vector<Token>
 {
-	this->name = filename;
-	this->source = std::move(source);
-	pos = { 1, 0 };
-	current = 0;
+	start = source_;
+	curr = source_;
+	end = end_;
 
 	std::vector<Token> tokens;
-
-	while (!Eof())
+	while (curr < end)
 	{
-		tokens.push_back(NextToken());
+		auto token = NextToken();
+		if (token.type != Token::Type::Unknown)
+		{
+			token.offset = curr - start;
+			tokens.push_back(token);
+		}
 	}
 
 	return tokens;
 }
 
-auto Lexer::HadError() const -> bool
+auto Lexer::NextToken() -> Lm::Token
 {
-	return hadError;
-}
+NEXT_TOKEN:
 
-auto Lexer::NextToken() -> Token
-{
-	auto SingleToken = [&](const Token::Type type) {
-		File::Loc loc {
-			.start = pos,
-			.end = {pos.line, pos.column + 1},
-			.offset = current
-		};
-		return Token(type, std::string { Consume() }, std::move(loc));
-	};
+	switch (*curr++)
+	{
+		// Skip whitespace
+		case ' ':
+		case '\n':
+		case '\t':
+		case '\r':
+		case '\f':
+			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t' || *curr == '\r' ||
+									 *curr == '\f'))
+			{
+				++curr;
+			}
+			goto NEXT_TOKEN;
 
-	auto MultiToken = [&](const Token::Type type, const size_t size) {
-		std::string literal;
+		// Skip comments
+		case '#':
+			while (*curr != '\n')
+			{
+				++curr;
+			}
+			goto NEXT_TOKEN;
 
-		File::Loc loc;
-		loc.start = pos;
-		loc.offset = current;
-
-		for (size_t i = 0; i < size; ++i)
+		case '0' ... '9':
 		{
-			literal += Consume();
+			const auto tokStart = curr - 1;
+			auto type = Token::Type::Int32Literal;
+
+			while (curr < end && *curr >= '0' && *curr <= '9')
+			{
+				++curr;
+			}
+
+			if (*curr == '.')
+			{
+				type = Token::Type::Float64Literal;
+				++curr;
+				while (*curr >= '0' && *curr <= '9')
+				{
+					++curr;
+				}
+			}
+
+			return Token(type, std::string(tokStart, curr));
 		}
 
-		loc.end = pos;
-
-		return Token(type, std::move(literal), std::move(loc));
-	};
-
-	while (SkipWhitespace() || SkipComments())
-		;
-
-	if (Eof())
-	{
-		return SingleToken(Token::Type::Eof);
-	}
-
-	switch (Current())
-	{
-		case '0' ... '9': return Number();
-
-		case 'a' ... 'z':
 		case 'A' ... 'Z':
-		case '_': return Identifier();
+		case 'a' ... 'z':
+		case '_':
+		{
+			const auto tokStart = curr - 1;
+			while (
+				curr < end && ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
+								  (*curr >= '0' && *curr <= '9') || (*curr == '_')))
+			{
+				++curr;
+			}
 
-		case '"': return String();
+			std::string symbol(tokStart, curr);
+			auto type = Token::Type::Ident;
+
+			if (stringToTokenType.find(symbol) != stringToTokenType.end())
+			{
+				type = stringToTokenType.at(symbol);
+			}
+
+			if (type == Token::Type::Ident)
+			{
+				return Token(type, std::move(symbol));
+			}
+
+			return type;
+		}
+
+		case '"':
+		{
+			const auto tokStart = curr - 1;
+			while (curr < end && *curr != '"' && '\n')
+			{
+				++curr;
+			}
+			if (*++curr != '"')
+			{
+				// TODO(ruarq): error
+			}
+			return Token(Token::Type::StringLiteral, std::string(tokStart, curr));
+		}
+
 		case '\'':
 		{
-			File::Loc loc;
-			loc.start = pos;
-			loc.offset = current;
-
-			++current;
-			std::string literal { Consume() };
-			if (Consume() != '\'')
+			std::string symbol = { *curr };
+			if (*++curr)
 			{
-				Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
+				// TODO(ruarq): error
 			}
-
-			loc.end = pos;
-
-			return Token(Token::Type::CharLiteral, std::move(literal), std::move(loc));
+			return Token(Token::Type::CharLiteral, std::move(symbol));
 		}
 
-		case '(': return SingleToken(Token::Type::LParen);
-		case ')': return SingleToken(Token::Type::RParen);
-		case '[': return SingleToken(Token::Type::LBracket);
-		case ']': return SingleToken(Token::Type::RBracket);
-		case '{': return SingleToken(Token::Type::LCurly);
-		case '}': return SingleToken(Token::Type::RCurly);
-		case '.': return SingleToken(Token::Type::Dot);
-		case ',': return SingleToken(Token::Type::Comma);
-		case ';': return SingleToken(Token::Type::Semicolon);
-		case '$': return SingleToken(Token::Type::Cast);
-		case '@': return SingleToken(Token::Type::Attribute);
+		case '(': return Token::Type::LParen;
+		case ')': return Token::Type::RParen;
+		case '[': return Token::Type::LBracket;
+		case ']': return Token::Type::RBracket;
+		case '{': return Token::Type::LCurly;
+		case '}': return Token::Type::RCurly;
+		case '.': return Token::Type::Dot;
+		case ',': return Token::Type::Comma;
+		case '$': return Token::Type::Cast;
+		case '@': return Token::Type::Attribute;
 
 		case '-':
-			if (Match("->"))
+			if (*curr == '>')
 			{
-				return MultiToken(Token::Type::Arrow, 2);
+				++curr;
+				return Token::Type::Arrow;
 			}
-			else if (Match("-="))
+			else if (*curr == '=')
 			{
-				return MultiToken(Token::Type::MinusEqual, 2);
+				++curr;
+				return Token::Type::MinusEqual;
 			}
-			return SingleToken(Token::Type::Minus);
+			return Token::Type::Minus;
 
 		case '=':
-			if (Match("=="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::Equal, 2);
+				++curr;
+				return Token::Type::Equal;
 			}
-			else if (Match("=>"))
+			else if (*curr == '>')
 			{
-				return MultiToken(Token::Type::WideArrow, 2);
+				++curr;
+				return Token::Type::WideArrow;
 			}
-			return SingleToken(Token::Type::Assign);
+			return Token::Type::Assign;
 
 		case ':':
-			if (Match("::"))
+			if (*curr == ':')
 			{
-				return MultiToken(Token::Type::ColonColon, 2);
+				++curr;
+				return Token::Type::ColonColon;
 			}
-			return SingleToken(Token::Type::Colon);
+			return Token::Type::Colon;
 
 		case '+':
-			if (Match("+="))
+			if (*curr == '+')
 			{
-				return MultiToken(Token::Type::PlusEqual, 2);
+				++curr;
+				return Token::Type::PlusEqual;
 			}
-			return SingleToken(Token::Type::Plus);
+			else if (*curr == '=')
+			{
+				++curr;
+				return Token::Type::Plus;
+			}
+			return Token::Type::Plus;
 
 		case '*':
-			if (Match("*="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::StarEqual, 2);
+				++curr;
+				return Token::Type::StarEqual;
 			}
-			return SingleToken(Token::Type::Star);
+			return Token::Type::Star;
 
 		case '/':
-			if (Match("/="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::SlashEqual, 2);
+				++curr;
+				return Token::Type::SlashEqual;
 			}
-			return SingleToken(Token::Type::Slash);
+			return Token::Type::Slash;
 
 		case '%':
-			if (Match("%="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::ModEqual, 2);
+				++curr;
+				return Token::Type::ModEqual;
 			}
-			return SingleToken(Token::Type::Mod);
+			return Token::Type::Mod;
 
 		case '!':
-			if (Match("!="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::NotEqual, 2);
+				++curr;
+				return Token::Type::NotEqual;
 			}
-			return SingleToken(Token::Type::Not);
+			return Token::Type::Not;
 
 		case '<':
-			if (Match("<<="))
+			if (*curr == '<')
 			{
-				return MultiToken(Token::Type::LShiftEqual, 3);
+				++curr;
+				if (*curr == '=')
+				{
+					++curr;
+					return Token::Type::LShiftEqual;
+				}
+				return Token::Type::LShift;
 			}
-			else if (Match("<<"))
+			else if (*curr == '=')
 			{
-				return MultiToken(Token::Type::LShift, 2);
+				++curr;
+				return Token::Type::LessEqual;
 			}
-			else if (Match("<="))
-			{
-				return MultiToken(Token::Type::LessEqual, 2);
-			}
-			return SingleToken(Token::Type::Less);
+			return Token::Type::Less;
 
 		case '>':
-			if (Match(">>="))
+			if (*curr == '>')
 			{
-				return MultiToken(Token::Type::RShiftEqual, 3);
+				++curr;
+				if (*curr == '=')
+				{
+					++curr;
+					return Token::Type::RShiftEqual;
+				}
+				return Token::Type::RShift;
 			}
-			else if (Match(">>"))
+			else if (*curr == '=')
 			{
-				return MultiToken(Token::Type::RShift, 2);
+				++curr;
+				return Token::Type::GreaterEqual;
 			}
-			else if (Match(">="))
-			{
-				return MultiToken(Token::Type::GreaterEqual, 2);
-			}
-			return SingleToken(Token::Type::Greater);
+			return Token::Type::Greater;
 
 		case '&':
-			if (Match("&&"))
+			if (*curr == '&')
 			{
-				return MultiToken(Token::Type::AndAnd, 2);
+				++curr;
+				return Token::Type::AndAnd;
 			}
-			else if (Match("&="))
+			else if (*curr == '=')
 			{
-				return MultiToken(Token::Type::AndEqual, 2);
+				++curr;
+				return Token::Type::AndEqual;
 			}
-			return SingleToken(Token::Type::And);
+			return Token::Type::And;
 
 		case '|':
-			if (Match("||"))
+			if (*curr == '|')
 			{
-				return MultiToken(Token::Type::OrOr, 2);
+				++curr;
+				return Token::Type::OrOr;
 			}
-			else if (Match("|="))
+			else if (*curr == '=')
 			{
-				return MultiToken(Token::Type::OrEqual, 2);
+				++curr;
+				return Token::Type::OrEqual;
 			}
-			return SingleToken(Token::Type::Or);
+			return Token::Type::Or;
 
 		case '^':
-			if (Match("^="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::XorEqual, 2);
+				++curr;
+				return Token::Type::XorEqual;
 			}
-			return SingleToken(Token::Type::Xor);
+			return Token::Type::Xor;
 
 		case '~':
-			if (Match("=="))
+			if (*curr == '=')
 			{
-				return MultiToken(Token::Type::FlipEqual, 2);
+				++curr;
+				return Token::Type::FlipEqual;
 			}
-			return SingleToken(Token::Type::Flip);
+			return Token::Type::Flip;
 
-		default:
-			Error(pos, current, Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), Current());
-			return SingleToken(Token::Type::Unknown);
-	}
-}
-
-auto Lexer::Identifier() -> Token
-{
-	auto IsIdent = [](const char c) {
-		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c == '_');
-	};
-
-	auto GetKeywordType = [&](const std::string &ident) {
-		auto Match = [&](const std::string &match, const size_t offset) {
-			size_t i = offset;
-			for (const auto &c : match)
-			{
-				if (c != ident.at(i))
-				{
-					return false;
-				}
-
-				++i;
-			}
-			return true;
-		};
-
-		switch (ident.at(0))
-		{
-			case 'f':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'a':
-						if (Match("lse", 2))
-						{
-							return Token::Type::False;
-						}
-						return Token::Type::Ident;
-
-					case 'o':
-						if (Match("r", 2))
-						{
-							return Token::Type::For;
-						}
-						return Token::Type::Ident;
-
-					case '6':
-						if (Match("4", 2))
-						{
-							return Token::Type::Float64;
-						}
-						return Token::Type::Ident;
-
-					case '3':
-						if (Match("2", 2))
-						{
-							return Token::Type::Float32;
-						}
-						return Token::Type::Ident;
-
-					case 'n': return Token::Type::Fn;
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'm':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'o':
-						if (Match("dule", 2))
-						{
-							return Token::Type::Module;
-						}
-						return Token::Type::Ident;
-
-					case 'a':
-						if (Match("tch", 2))
-						{
-							return Token::Type::Match;
-						}
-						return Token::Type::Ident;
-
-					case 'u':
-						if (Match("t", 2))
-						{
-							return Token::Type::Mut;
-						}
-						return Token::Type::Ident;
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'i':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'm':
-						if (ident.size() <= 2)
-						{
-							return Token::Type::Ident;
-						}
-
-						switch (ident.at(2))
-						{
-							case 'p':
-								if (Match("ort", 2))
-								{
-									return Token::Type::Import;
-								}
-								return Token::Type::Ident;
-
-							default: return Token::Type::Ident;
-						}
-
-					case 'f': return Token::Type::If;
-
-					case '6':
-						if (Match("4", 2))
-						{
-							return Token::Type::Int64;
-						}
-						return Token::Type::Ident;
-
-					case '3':
-						if (Match("2", 2))
-						{
-							return Token::Type::Int32;
-						}
-						return Token::Type::Ident;
-
-					case '1':
-						if (Match("6", 2))
-						{
-							return Token::Type::Int16;
-						}
-						return Token::Type::Ident;
-
-					case '8': return Token::Type::Int8;
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'u':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'l':
-						if (Match("ong", 2))
-						{
-							return Token::Type::ULong;
-						}
-						return Token::Type::Ident;
-
-					case '6':
-						if (Match("4", 2))
-						{
-							return Token::Type::UInt64;
-						}
-						return Token::Type::Ident;
-
-					case '3':
-						if (Match("2", 2))
-						{
-							return Token::Type::UInt32;
-						}
-						return Token::Type::Ident;
-
-					case '1':
-						if (Match("6", 2))
-						{
-							return Token::Type::UInt16;
-						}
-						return Token::Type::Ident;
-
-					case '8': return Token::Type::UInt8;
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'r':
-				if (Match("et", 1))
-				{
-					return Token::Type::Ret;
-				}
-				return Token::Type::Ident;
-
-			case 'l':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'e':
-						if (Match("t", 2))
-						{
-							return Token::Type::Let;
-						}
-						return Token::Type::Ident;
-
-					case 'o':
-						if (ident.size() <= 2)
-						{
-							return Token::Type::Ident;
-						}
-
-						switch (ident.at(2))
-						{
-							case 'n':
-								if (Match("g", 3))
-								{
-									return Token::Type::Long;
-								}
-								return Token::Type::Ident;
-
-							case 'c':
-								if (Match("al", 3))
-								{
-									return Token::Type::Local;
-								}
-								return Token::Type::Ident;
-
-							case 'o':
-								if (Match("p", 3))
-								{
-									return Token::Type::Loop;
-								}
-								return Token::Type::Ident;
-
-							default: return Token::Type::Ident;
-						}
-
-					default: return Token::Type::Ident;
-				}
-
-			case 's':
-				if (Match("truct", 1))
-				{
-					return Token::Type::Struct;
-				}
-				return Token::Type::Ident;
-
-			case 'e':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'l':
-						if (ident.size() <= 2)
-						{
-							return Token::Type::Ident;
-						}
-
-						switch (ident.at(2))
-						{
-							case 's':
-								if (Match("e", 3))
-								{
-									return Token::Type::Else;
-								}
-								return Token::Type::Ident;
-
-							case 'i':
-								if (Match("f", 3))
-								{
-									return Token::Type::Elif;
-								}
-								return Token::Type::Ident;
-
-							default: return Token::Type::Ident;
-						}
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'b':
-				if (ident.size() <= 1)
-				{
-					return Token::Type::Ident;
-				}
-
-				switch (ident.at(1))
-				{
-					case 'r':
-						if (Match("eak", 1))
-						{
-							return Token::Type::Break;
-						}
-						return Token::Type::Ident;
-
-					case 'o':
-						if (Match("ol", 1))
-						{
-							return Token::Type::Bool;
-						}
-						return Token::Type::Ident;
-
-					default: return Token::Type::Ident;
-				}
-
-			case 'c':
-				if (Match("har", 1))
-				{
-					return Token::Type::Char;
-				}
-				return Token::Type::Ident;
-
-			case 't':
-				if (Match("rue", 1))
-				{
-					return Token::Type::True;
-				}
-				return Token::Type::Ident;
-
-			default: return Token::Type::Ident;
-		}
-	};
-
-	File::Loc loc;
-	loc.start = pos;
-	loc.offset = current;
-
-	std::string literal;
-	while (IsIdent(Current()))
-	{
-		literal += Consume();
+		default: break;
 	}
 
-	loc.end = pos;
-
-	return Token(GetKeywordType(literal), std::move(literal), std::move(loc));
-}
-
-auto Lexer::Number() -> Token
-{
-	auto IsNumber = [](const char c) {
-		return c >= '0' && c <= '9';
-	};
-
-	File::Loc loc;
-	loc.start = pos;
-	loc.offset = current;
-
-	std::string literal;
-	auto type = Token::Type::Int32Literal;
-
-	while (IsNumber(Current()))
-	{
-		literal += Consume();
-	}
-
-	if (Current() == '.')
-	{
-		literal += Consume();
-		type = Token::Type::Float64Literal;
-		while (IsNumber(Consume()))
-		{
-			literal += Consume();
-		}
-	}
-
-	loc.end = pos;
-
-	return Token(type, std::move(literal), std::move(loc));
-}
-
-auto Lexer::String() -> Token
-{
-	File::Loc loc;
-	loc.start = pos;
-	loc.offset = current;
-
-	++current;
-
-	std::string literal;
-	while (!Eof() && Current() != '"' && Current() != '\n')
-	{
-		literal += Consume();
-	}
-
-	if (Current() != '"')
-	{
-		Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
-	}
-
-	++current;
-
-	loc.end = pos;
-
-	return Token(Token::Type::StringLiteral, std::move(literal), std::move(loc));
-}
-
-auto Lexer::SkipWhitespace() -> bool
-{
-	auto IsWhitespace = [](const char &c) {
-		return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
-	};
-
-	const auto prev = current;
-	while (IsWhitespace(Current()))
-	{
-		if (Current() == '\n')
-		{
-			++pos.line;
-			pos.column = 0;
-		}
-		++current;
-	}
-
-	return prev != current;
-}
-
-auto Lexer::SkipComments() -> bool
-{
-	if (Current() == '#')
-	{
-		while (Current() != '\n')
-		{
-			Consume();
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-auto Lexer::Current() const -> char
-{
-	return source[current];
-}
-
-auto Lexer::Consume() -> char
-{
-	++pos.column;
-	return source[current++];
-}
-
-auto Lexer::Match(const std::string &match, const size_t offset) -> bool
-{
-	size_t i = offset;
-	for (const auto &c : match)
-	{
-		if (c != source[current + i])
-		{
-			return false;
-		}
-		++i;
-	}
-
-	return true;
-}
-
-auto Lexer::Eof() const -> bool
-{
-	return current >= source.size();
+	return Token::Type::Unknown;
 }
 }

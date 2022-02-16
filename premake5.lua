@@ -15,7 +15,6 @@ project "lmc"
 	filter { "configurations:debug" }
 		symbols "On"
 		defines { "DEBUG" }
-		buildoptions { "-g3" }
 
 	filter { "configurations:release" }
 		optimize "Speed"

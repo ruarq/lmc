@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include <string>
+#include <cstdint>
 
-#include "../File.hpp"
+#include "../Symbol.hpp"
 
 namespace Lm
 {
@@ -41,7 +41,7 @@ public:
 	/**
 	 * @brief defines the type of a token
 	 */
-	enum class Type
+	enum class Type : std::uint8_t
 	{
 		LParen,			 ///< (
 		RParen,			 ///< )
@@ -135,12 +135,15 @@ public:
 	};
 
 public:
-	Token(const Type type, std::string &&literal, File::Loc &&loc);
+	Token(const Type type);
+	Token(const Type type, const Symbol symbol);
 
 public:
-	const Type type;			  ///< The type of the token
-	const std::string literal;	  ///< The literal of the token
-	const File::Loc loc;
+	Type type;	  ///< The type of the token
+	Symbol symbol;
+	std::size_t offset;
 };
+
+const extern std::unordered_map<std::string, Token::Type> stringToTokenType;
 
 }

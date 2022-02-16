@@ -61,13 +61,17 @@ public:
 	template<typename... Args>
 	static auto Debug(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
 	{
-		fmt::print("{} {}\n", fmt::format(fmt::fg(debugColor), "[DEBUG]"), fmt::format(fmt, args...));
+		fmt::print("{} {}\n",
+			fmt::format(fmt::fg(debugColor), "[DEBUG]"),
+			fmt::format(fmt, args...));
 	}
 
 	template<typename... Args>
 	static auto Info(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
 	{
-		fmt::print("{} {}\n", fmt::format(fmt::fg(infoColor), "{}:", Locale::Get("INFO")), fmt::format(fmt, args...));
+		fmt::print("{} {}\n",
+			fmt::format(fmt::fg(infoColor), "{}:", Locale::Get("INFO")),
+			fmt::format(fmt, args...));
 	}
 
 	template<typename... Args>
@@ -98,9 +102,10 @@ public:
 	}
 
 	template<typename... Args>
-	static auto
-	ErrorFile(const std::string &filename, const File::Pos &pos, const fmt::format_string<Args...> &fmt, Args &&...args)
-		-> void
+	static auto ErrorFile(const std::string &filename,
+		const File::Pos &pos,
+		const fmt::format_string<Args...> &fmt,
+		Args &&...args) -> void
 	{
 		Error("{} {}",
 			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),

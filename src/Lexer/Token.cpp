@@ -28,11 +28,51 @@
 namespace Lm
 {
 
-Token::Token(const Type type, std::string &&literal, File::Loc &&loc)
+Token::Token(const Type type)
 	: type(type)
-	, literal(literal)
-	, loc(loc)
 {
 }
 
+Token::Token(const Type type, const Symbol symbol)
+	: type(type)
+	, symbol(symbol)
+{
+}
+
+const std::unordered_map<std::string, Token::Type> stringToTokenType = {
+	// clang-format off
+	{ "fn",			Token::Type::Fn			},
+	{ "mut",		Token::Type::Mut		},
+	{ "let",		Token::Type::Let		},
+	{ "ret",		Token::Type::Ret		},
+	{ "module",		Token::Type::Module		},
+	{ "import",		Token::Type::Import		},
+	{ "struct",		Token::Type::Struct		},
+	{ "local",		Token::Type::Local		},
+	{ "match",		Token::Type::Match		},
+	{ "for",		Token::Type::For		},
+	{ "loop",		Token::Type::Loop		},
+	{ "if",			Token::Type::If			},
+	{ "elif",		Token::Type::Elif		},
+	{ "else",		Token::Type::Else		},
+	{ "break",		Token::Type::Break		},
+	{ "continue",	Token::Type::Continue	},
+	{ "i8",			Token::Type::Int8		},
+	{ "u8",			Token::Type::UInt8		},
+	{ "i16",		Token::Type::Int16		},
+	{ "u16",		Token::Type::UInt16		},
+	{ "i32",		Token::Type::Int32		},
+	{ "u32",		Token::Type::UInt32		},
+	{ "i64",		Token::Type::Int64		},
+	{ "u64",		Token::Type::UInt64		},
+	{ "f32",		Token::Type::Float32	},
+	{ "f64",		Token::Type::Float64	},
+	{ "long",		Token::Type::Long		},
+	{ "ulong",		Token::Type::ULong		},
+	{ "char",		Token::Type::Char		},
+	{ "bool",		Token::Type::Bool		},
+	{ "true",		Token::Type::True		},
+	{ "false",		Token::Type::False		}
+	// clang-format on
+};
 }
