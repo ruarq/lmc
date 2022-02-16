@@ -18,3 +18,4 @@ project "lmc"
 
 	filter { "configurations:release" }
 		optimize "Speed"
+		defines { "DEBUG" }

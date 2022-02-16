@@ -59,7 +59,7 @@ public:
 
 public:
 	template<typename... Args>
-	static auto Debug(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	static auto Debug(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n",
 			fmt::format(fmt::fg(debugColor), "[DEBUG]"),
@@ -67,7 +67,7 @@ public:
 	}
 
 	template<typename... Args>
-	static auto Info(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	static auto Info(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n",
 			fmt::format(fmt::fg(infoColor), "{}:", Locale::Get("INFO")),
@@ -75,7 +75,7 @@ public:
 	}
 
 	template<typename... Args>
-	static auto Warning(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	static auto Warning(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n",
 			fmt::format(fmt::fg(warningColor) | warningEmphasis, "{}:", Locale::Get("WARNING")),
@@ -85,7 +85,7 @@ public:
 	template<typename... Args>
 	static auto WarningFile(const std::string &filename,
 		const File::Pos &pos,
-		const fmt::format_string<Args...> &fmt,
+		const std::string &fmt,
 		Args &&...args) -> void
 	{
 		Warning("{} {}",
@@ -94,7 +94,7 @@ public:
 	}
 
 	template<typename... Args>
-	static auto Error(const fmt::format_string<Args...> &fmt, Args &&...args) -> void
+	static auto Error(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n",
 			fmt::format(fmt::fg(errorColor) | errorEmphasis, "{}:", Locale::Get("ERROR")),
@@ -104,7 +104,7 @@ public:
 	template<typename... Args>
 	static auto ErrorFile(const std::string &filename,
 		const File::Pos &pos,
-		const fmt::format_string<Args...> &fmt,
+		const std::string &fmt,
 		Args &&...args) -> void
 	{
 		Error("{} {}",
