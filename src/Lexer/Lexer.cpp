@@ -43,11 +43,9 @@ auto Lexer::Run(const char *source_, const char *end_) -> std::vector<Token>
 			token.offset = curr - start;
 			tokens.push_back(token);
 		}
-		else if (curr >= end)
-		{
-			tokens.push_back(Token::Type::Eof);
-		}
 	}
+
+	tokens.push_back(Token::Type::Eof);
 
 	return tokens;
 }
