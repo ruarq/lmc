@@ -146,13 +146,6 @@ int main(int argc, char **argv)
 			(double)(file.Size()) /
 				(duration.count() * 1048576.0));	// Conversion from B/s to MiB/s
 
-		for (const auto &token : tokens)
-		{
-			fmt::print("{} - '{}'\n",
-				(std::uint8_t)token.type,
-				token.symbol ? token.symbol.String() : "");
-		}
-
 		/**
 		 * Parsing
 		 */
