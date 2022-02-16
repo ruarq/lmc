@@ -43,6 +43,10 @@ auto Lexer::Run(const char *source_, const char *end_) -> std::vector<Token>
 			token.offset = curr - start;
 			tokens.push_back(token);
 		}
+		else if (curr >= end)
+		{
+			tokens.push_back(Token::Type::Eof);
+		}
 	}
 
 	return tokens;
@@ -156,6 +160,7 @@ NEXT_TOKEN:
 		case ']': return Token::Type::RBracket;
 		case '{': return Token::Type::LCurly;
 		case '}': return Token::Type::RCurly;
+		case ';': return Token::Type::Semicolon;
 		case '.': return Token::Type::Dot;
 		case ',': return Token::Type::Comma;
 		case '$': return Token::Type::Cast;
