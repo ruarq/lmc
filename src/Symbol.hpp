@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -36,6 +37,9 @@ using symbol_id_t = unsigned long;
 
 class Symbol final
 {
+public:
+	static constexpr auto invalidId = std::numeric_limits<symbol_id_t>::max();
+
 public:
 	static auto NextId() -> symbol_id_t;
 	static auto DropHashmap() -> void;
@@ -49,10 +53,14 @@ public:
 	Symbol(std::string &&str);
 
 public:
+	auto String() const -> const std::string &;
+
+public:
 	auto operator=(std::string &&str) -> Symbol &;
+	operator bool() const;
 
 private:
-	symbol_id_t id;
+	symbol_id_t id = invalidId;
 };
 
 }

@@ -47,6 +47,11 @@ Symbol::Symbol(std::string &&str)
 	operator=(std::move(str));
 }
 
+auto Symbol::String() const -> const std::string &
+{
+	return pool[id];
+}
+
 auto Symbol::operator=(std::string &&str) -> Symbol &
 {
 	if (stringToId.find(str) == stringToId.end())
@@ -61,6 +66,11 @@ auto Symbol::operator=(std::string &&str) -> Symbol &
 	}
 
 	return *this;
+}
+
+Symbol::operator bool() const
+{
+	return id != invalidId;
 }
 
 }

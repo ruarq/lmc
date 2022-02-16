@@ -1,0 +1,6 @@
+import std::io;
+
+fn main() -> i32 {
+	io::write("Hello world!\n");
+	ret 0;
+}

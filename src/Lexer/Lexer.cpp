@@ -128,7 +128,7 @@ NEXT_TOKEN:
 
 		case '"':
 		{
-			const auto tokStart = curr - 1;
+			const auto tokStart = curr;
 			while (curr < end && *curr != '"' && '\n')
 			{
 				++curr;
@@ -137,7 +137,7 @@ NEXT_TOKEN:
 			{
 				// TODO(ruarq): error
 			}
-			return Token(Token::Type::StringLiteral, std::string(tokStart, curr));
+			return Token(Token::Type::StringLiteral, std::string(tokStart, curr - 1));
 		}
 
 		case '\'':
