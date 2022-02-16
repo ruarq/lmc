@@ -29,7 +29,7 @@ namespace Lm
 {
 
 std::vector<std::string> Symbol::pool;
-std::unordered_map<std::string, symbol_id_t> Symbol::stringToId;
+std::unordered_map<std::string, symbol_id_t, FastStringHash> Symbol::stringToId;
 
 auto Symbol::NextId() -> symbol_id_t
 {

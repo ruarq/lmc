@@ -25,44 +25,26 @@
 
 #pragma once
 
-#include <limits>
 #include <string>
-#include <unordered_map>
-#include <vector>
+#include <cstdint>
+#include <ctime>
 
-#include "FastStringHash.hpp"
+#include <immintrin.h>
+
+#define FAST_STRING_HASH(version) \
+	namespace version \
+	{ \
+		struct FastStringHash final \
+		{ \
+			auto operator()(const std::string &str) const -> size_t; \
+		}; \
+	}
 
 namespace Lm
 {
 
-using symbol_id_t = unsigned long;
+FAST_STRING_HASH(v0);
 
-class Symbol final
-{
-public:
-	static constexpr auto invalidId = std::numeric_limits<symbol_id_t>::max();
-
-public:
-	static auto NextId() -> symbol_id_t;
-	static auto DropHashmap() -> void;
-
-public:
-	static std::vector<std::string> pool;
-	static std::unordered_map<std::string, symbol_id_t, FastStringHash> stringToId;
-
-public:
-	Symbol() = default;
-	Symbol(std::string &&str);
-
-public:
-	auto String() const -> const std::string &;
-
-public:
-	auto operator=(std::string &&str) -> Symbol &;
-	operator bool() const;
-
-private:
-	symbol_id_t id = invalidId;
-};
+using FastStringHash = std::hash<std::string>;
 
 }

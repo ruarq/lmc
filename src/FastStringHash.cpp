@@ -23,46 +23,22 @@
  * IN THE SOFTWARE.
  */
 
-#pragma once
-
-#include <limits>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "FastStringHash.hpp"
 
 namespace Lm
 {
 
-using symbol_id_t = unsigned long;
-
-class Symbol final
+auto v0::FastStringHash::operator()(const std::string &str) const -> size_t
 {
-public:
-	static constexpr auto invalidId = std::numeric_limits<symbol_id_t>::max();
+	static size_t seed = std::time(nullptr);
+	size_t hash = seed;
 
-public:
-	static auto NextId() -> symbol_id_t;
-	static auto DropHashmap() -> void;
+	for (size_t i = 0; i < str.size(); i += 2)
+	{
+		hash += str[i];
+	}
 
-public:
-	static std::vector<std::string> pool;
-	static std::unordered_map<std::string, symbol_id_t, FastStringHash> stringToId;
-
-public:
-	Symbol() = default;
-	Symbol(std::string &&str);
-
-public:
-	auto String() const -> const std::string &;
-
-public:
-	auto operator=(std::string &&str) -> Symbol &;
-	operator bool() const;
-
-private:
-	symbol_id_t id = invalidId;
-};
+	return hash;
+}
 
 }

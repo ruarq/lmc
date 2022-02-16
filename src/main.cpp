@@ -37,6 +37,7 @@
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
 #include "Tools.hpp"
+#include "FastStringHash.hpp"
 
 using namespace std::string_literals;
 

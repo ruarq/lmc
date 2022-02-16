@@ -39,7 +39,7 @@ Token::Token(const Type type, const Symbol symbol)
 {
 }
 
-const std::unordered_map<std::string, Token::Type> stringToTokenType = {
+const std::unordered_map<std::string, Token::Type, FastStringHash> stringToTokenType = {
 	// clang-format off
 	{ "fn",			Token::Type::Fn			},
 	{ "mut",		Token::Type::Mut		},

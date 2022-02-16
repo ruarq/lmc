@@ -28,6 +28,7 @@
 #include <cstdint>
 
 #include "../Symbol.hpp"
+#include "../FastStringHash.hpp"
 
 namespace Lm
 {
@@ -141,9 +142,9 @@ public:
 public:
 	Type type;	  ///< The type of the token
 	Symbol symbol;
-	std::size_t offset;
+	size_t offset;
 };
 
-const extern std::unordered_map<std::string, Token::Type> stringToTokenType;
+const extern std::unordered_map<std::string, Token::Type, FastStringHash> stringToTokenType;
 
 }
