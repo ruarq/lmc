@@ -27,8 +27,8 @@
 
 #include <cstdint>
 
-#include "../Symbol.hpp"
 #include "../FastStringHash.hpp"
+#include "../Symbol.hpp"
 
 namespace Lm
 {
@@ -136,6 +136,7 @@ public:
 	};
 
 public:
+	Token();
 	Token(const Type type);
 	Token(const Type type, const Symbol symbol);
 

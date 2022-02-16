@@ -28,24 +28,19 @@
 namespace Lm
 {
 
-auto Lexer::Run(const char *source_, const char *end_) -> std::vector<Token>
+auto Lexer::Run(const std::string &source) -> std::vector<Token>
 {
-	start = source_;
-	curr = source_;
-	end = end_;
+	start = source.data();
+	curr = start;
+	end = source.data() + source.size();
 
 	std::vector<Token> tokens;
 	while (curr < end)
 	{
 		auto token = NextToken();
-		if (token.type != Token::Type::Unknown)
-		{
-			token.offset = curr - start;
-			tokens.push_back(token);
-		}
+		token.offset = offset;
+		tokens.push_back(token);
 	}
-
-	tokens.push_back(Token::Type::Eof);
 
 	return tokens;
 }
@@ -54,8 +49,12 @@ auto Lexer::NextToken() -> Lm::Token
 {
 NEXT_TOKEN:
 
+	offset = curr - start;
+
 	switch (*curr++)
 	{
+		case '\0': return Token::Type::Eof;
+
 		// Skip whitespace
 		case ' ':
 		case '\n':

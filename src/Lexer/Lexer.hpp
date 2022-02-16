@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "Token.hpp"
@@ -39,7 +40,7 @@ public:
 	/**
 	 * @brief Run the lexer over a source
 	 */
-	auto Run(const char *source, const char *end) -> std::vector<Token>;
+	auto Run(const std::string &source) -> std::vector<Token>;
 
 private:
 	auto NextToken() -> Token;
@@ -48,6 +49,7 @@ private:
 	const char *start;
 	const char *curr;
 	const char *end;
+	size_t offset;
 };
 
 }

@@ -25,19 +25,19 @@
 
 #pragma once
 
-#include <string>
 #include <cstdint>
 #include <ctime>
+#include <string>
 
 #include <immintrin.h>
 
 #define FAST_STRING_HASH(version) \
 	namespace version \
 	{ \
-		struct FastStringHash final \
-		{ \
-			auto operator()(const std::string &str) const -> size_t; \
-		}; \
+	struct FastStringHash final \
+	{ \
+		auto operator()(const std::string &str) const -> size_t; \
+	}; \
 	}
 
 namespace Lm

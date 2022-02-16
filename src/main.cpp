@@ -30,6 +30,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "FastStringHash.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
@@ -37,7 +38,6 @@
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
 #include "Tools.hpp"
-#include "FastStringHash.hpp"
 
 using namespace std::string_literals;
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 		Lm::Lexer lexer;
 
 		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
-		const auto tokens = lexer.Run(content.data(), content.data() + content.size());
+		const auto tokens = lexer.Run(content);
 		LM_IGNORE_IN_RELEASE(
 			const auto lexingEnd = std::chrono::high_resolution_clock::now();
 			const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)

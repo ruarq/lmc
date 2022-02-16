@@ -28,6 +28,11 @@
 namespace Lm
 {
 
+Token::Token()
+	: type(Token::Type::Unknown)
+{
+}
+
 Token::Token(const Type type)
 	: type(type)
 {
