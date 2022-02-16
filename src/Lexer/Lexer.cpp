@@ -28,9 +28,10 @@
 namespace Lm
 {
 
-auto Lexer::Run(const File &file) -> std::vector<Token>
+auto Lexer::Run(const std::string &filename, std::string &&source) -> std::vector<Token>
 {
-	this->file = &file;
+	this->name = filename;
+	this->source = std::move(source);
 	pos = { 1, 0 };
 	current = 0;
 
@@ -52,12 +53,12 @@ auto Lexer::HadError() const -> bool
 auto Lexer::NextToken() -> Token
 {
 	auto SingleToken = [&](const Token::Type type) {
-		const File::Loc loc {
+		File::Loc loc {
 			.start = pos,
 			.end = {pos.line, pos.column + 1},
 			.offset = current
 		};
-		return Token(type, { Consume() }, loc);
+		return Token(type, std::string { Consume() }, std::move(loc));
 	};
 
 	auto MultiToken = [&](const Token::Type type, const size_t size) {
@@ -74,7 +75,7 @@ auto Lexer::NextToken() -> Token
 
 		loc.end = pos;
 
-		return Token(type, std::string(literal), loc);
+		return Token(type, std::move(literal), std::move(loc));
 	};
 
 	while (SkipWhitespace() || SkipComments())
@@ -85,8 +86,7 @@ auto Lexer::NextToken() -> Token
 		return SingleToken(Token::Type::Eof);
 	}
 
-	const auto currentChar = Current();
-	switch (currentChar)
+	switch (Current())
 	{
 		case '0' ... '9': return Number();
 
@@ -101,7 +101,7 @@ auto Lexer::NextToken() -> Token
 			loc.start = pos;
 			loc.offset = current;
 
-			Consume();
+			++current;
 			std::string literal { Consume() };
 			if (Consume() != '\'')
 			{
@@ -110,7 +110,7 @@ auto Lexer::NextToken() -> Token
 
 			loc.end = pos;
 
-			return Token(Token::Type::CharLiteral, std::move(literal), loc);
+			return Token(Token::Type::CharLiteral, std::move(literal), std::move(loc));
 		}
 
 		case '(': return SingleToken(Token::Type::LParen);
@@ -249,14 +249,14 @@ auto Lexer::NextToken() -> Token
 			return SingleToken(Token::Type::Xor);
 
 		case '~':
-			if (Match("~="))
+			if (Match("=="))
 			{
 				return MultiToken(Token::Type::FlipEqual, 2);
 			}
 			return SingleToken(Token::Type::Flip);
 
 		default:
-			Error(pos, current, Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), currentChar);
+			Error(pos, current, Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), Current());
 			return SingleToken(Token::Type::Unknown);
 	}
 }
@@ -607,7 +607,7 @@ auto Lexer::Identifier() -> Token
 
 	loc.end = pos;
 
-	return Token(GetKeywordType(literal), std::move(literal), loc);
+	return Token(GetKeywordType(literal), std::move(literal), std::move(loc));
 }
 
 auto Lexer::Number() -> Token
@@ -640,7 +640,7 @@ auto Lexer::Number() -> Token
 
 	loc.end = pos;
 
-	return Token(type, std::move(literal), loc);
+	return Token(type, std::move(literal), std::move(loc));
 }
 
 auto Lexer::String() -> Token
@@ -649,7 +649,8 @@ auto Lexer::String() -> Token
 	loc.start = pos;
 	loc.offset = current;
 
-	Consume();
+	++current;
+
 	std::string literal;
 	while (!Eof() && Current() != '"' && Current() != '\n')
 	{
@@ -661,11 +662,11 @@ auto Lexer::String() -> Token
 		Error(loc.start, loc.offset, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
 	}
 
-	Consume();
+	++current;
 
 	loc.end = pos;
 
-	return Token(Token::Type::StringLiteral, std::move(literal), loc);
+	return Token(Token::Type::StringLiteral, std::move(literal), std::move(loc));
 }
 
 auto Lexer::SkipWhitespace() -> bool
@@ -674,21 +675,25 @@ auto Lexer::SkipWhitespace() -> bool
 		return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
 	};
 
-	bool skipped = false;
+	const auto prev = current;
 	while (IsWhitespace(Current()))
 	{
-		skipped = true;
-		Consume();
+		if (Current() == '\n')
+		{
+			++pos.line;
+			pos.column = 0;
+		}
+		++current;
 	}
 
-	return skipped;
+	return prev != current;
 }
 
 auto Lexer::SkipComments() -> bool
 {
 	if (Current() == '#')
 	{
-		while (!Eof() && Current() != '\n')
+		while (Current() != '\n')
 		{
 			Consume();
 		}
@@ -701,35 +706,13 @@ auto Lexer::SkipComments() -> bool
 
 auto Lexer::Current() const -> char
 {
-	if (!Eof())
-	{
-		return file->content.at(current);
-	}
-	else
-	{
-		return '\0';
-	}
+	return source[current];
 }
 
 auto Lexer::Consume() -> char
 {
-	if (!Eof())
-	{
-		const auto currentChar = file->content.at(current++);
-		++pos.column;
-
-		if (currentChar == '\n')
-		{
-			++pos.line;
-			pos.column = 0;
-		}
-
-		return currentChar;
-	}
-	else
-	{
-		return '\0';
-	}
+	++pos.column;
+	return source[current++];
 }
 
 auto Lexer::Match(const std::string &match, const size_t offset) -> bool
@@ -737,7 +720,7 @@ auto Lexer::Match(const std::string &match, const size_t offset) -> bool
 	size_t i = offset;
 	for (const auto &c : match)
 	{
-		if (c != file->content.at(current + i))
+		if (c != source[current + i])
 		{
 			return false;
 		}
@@ -749,6 +732,6 @@ auto Lexer::Match(const std::string &match, const size_t offset) -> bool
 
 auto Lexer::Eof() const -> bool
 {
-	return current >= file->content.size();
+	return current >= source.size();
 }
 }

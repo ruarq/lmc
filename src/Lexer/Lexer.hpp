@@ -44,7 +44,7 @@ public:
 	/**
 	 * @brief Run the lexer over a source
 	 */
-	auto Run(const File &file) -> std::vector<Token>;
+	auto Run(const std::string &filename, std::string &&source) -> std::vector<Token>;
 
 	/**
 	 * @return True if the lexer had an error, false if not
@@ -113,14 +113,14 @@ private:
 		-> void
 	{
 		hadError = true;
-		Logger::ErrorFile(file->name, where, fmt, args...);
+		Logger::ErrorFile(name, where, fmt, args...);
 
 		// TODO(ruarq): Improve this section if possible
 		const auto color = fmt::color::yellow_green;
 
-		const auto lineStart = file->content.rfind('\n', offset) + 1;
-		const auto lineEnd = file->content.find('\n', lineStart + 1);
-		const std::string line = file->content.substr(lineStart, lineEnd - lineStart);
+		const auto lineStart = source.rfind('\n', offset) + 1;
+		const auto lineEnd = source.find('\n', lineStart + 1);
+		const std::string line = source.substr(lineStart, lineEnd - lineStart);
 
 		fmt::print("{}\n", line);
 		for (size_t i = 0; i < where.column; ++i)
@@ -138,7 +138,9 @@ private:
 	}
 
 private:
-	const File *file;
+	std::string name;
+	std::string source;
+
 	File::Pos pos;
 	size_t current;
 

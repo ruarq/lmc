@@ -57,9 +57,19 @@ public:
 	 */
 	File(const std::string &filename);
 
+	~File();
+
+	/**
+	 * @brief Reads the file
+	 */
+	auto Read() const -> std::string;
+
 public:
 	std::string name;
-	std::string content;
+	size_t size;
+
+private:
+	FILE *file;
 };
 
 }

@@ -33,7 +33,7 @@ namespace Lm
 File::File(const std::string &filename)
 	: name(filename)
 {
-	std::FILE *file = fopen(filename.c_str(), "r");
+	file = fopen(filename.c_str(), "r");
 	if (!file)
 	{
 		LM_DEBUG("Couldn't open file '{}'", filename);
@@ -41,15 +41,20 @@ File::File(const std::string &filename)
 	}
 
 	fseek(file, 0, SEEK_END);
-	const auto fileSize = ftell(file);
+	size = ftell(file);
 	fseek(file, 0, SEEK_SET);
+}
 
-	content = std::string(fileSize, 0);
-
-	const auto bytesRead = fread(content.data(), sizeof(char), fileSize, file);
-	LM_DEBUG("Read {} bytes from '{}'", bytesRead, filename);
-
+File::~File()
+{
 	fclose(file);
+}
+
+auto File::Read() const -> std::string
+{
+	std::string content(size, '\0');
+	fread(content.data(), sizeof(char), size, file);
+	return content;
 }
 
 }

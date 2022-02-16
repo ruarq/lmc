@@ -123,22 +123,23 @@ int main(int argc, char **argv)
 
 	for (const auto &filename : filenames)
 	{
-		LM_DEBUG("Lexing through '{}'", filename);
-		const Lm::File file(filename);
+		Lm::File file(filename);
 
 		/**
 		 * Lexing
 		 */
 		Lm::Lexer lexer;
 
-		LM_IGNORE_IN_RELEASE(auto lexingStart = std::chrono::high_resolution_clock::now();)
-		const auto tokens = lexer.Run(file);
-		LM_IGNORE_IN_RELEASE(auto lexingEnd = std::chrono::high_resolution_clock::now();)
+		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
+		const auto tokens = lexer.Run(file.name, file.Read());
+		LM_IGNORE_IN_RELEASE(const auto lexingEnd = std::chrono::high_resolution_clock::now();
+							 const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
 
-		LM_DEBUG("Read {} tokens from '{}' in {}",
-			tokens.size(),
+		LM_DEBUG("{}: - {} tokens - {} - {:.2f} MiB/s",
 			file.name,
-			std::chrono::duration<double>(lexingEnd - lexingStart));
+			tokens.size(),
+			duration,
+			(double)(file.size) / (duration.count() * 1048576.0));	  // Conversion from B/s to MiB/s
 
 		if (lexer.HadError())
 		{
@@ -148,8 +149,8 @@ int main(int argc, char **argv)
 		/**
 		 * Parsing
 		 */
-		Lm::Parser parser;
-		auto translationUnit = parser.Run(tokens);
+		// Lm::Parser parser;
+		// auto translationUnit = parser.Run(tokens);
 	}
 
 	return 0;

@@ -28,9 +28,9 @@
 namespace Lm
 {
 
-Token::Token(const Type type, std::string &&literal, const File::Loc loc)
+Token::Token(const Type type, std::string &&literal, File::Loc &&loc)
 	: type(type)
-	, literal(SymbolPool::Insert(std::move(literal)))
+	, literal(literal)
 	, loc(loc)
 {
 }

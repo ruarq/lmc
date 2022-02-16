@@ -28,7 +28,6 @@
 #include <string>
 
 #include "../File.hpp"
-#include "../SymbolPool.hpp"
 
 namespace Lm
 {
@@ -136,11 +135,11 @@ public:
 	};
 
 public:
-	Token(const Type type, std::string &&literal, const File::Loc loc);
+	Token(const Type type, std::string &&literal, File::Loc &&loc);
 
 public:
-	const Type type;		 ///< The type of the token
-	const Symbol literal;	 ///< The literal of the token
+	const Type type;			  ///< The type of the token
+	const std::string literal;	  ///< The literal of the token
 	const File::Loc loc;
 };
 
