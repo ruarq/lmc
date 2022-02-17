@@ -33,6 +33,13 @@
 namespace Lm
 {
 
+struct SourcePos final
+{
+	size_t line;
+	size_t column;
+	size_t offset;
+};
+
 /**
  * @brief stores all information about a lexical token
  */
@@ -141,9 +148,9 @@ public:
 	Token(const Type type, const Symbol symbol);
 
 public:
-	Type type;	  ///< The type of the token
-	Symbol symbol;
-	size_t offset;
+	Type type;		  ///< The type of the token
+	Symbol symbol;	  ///< The tokens symbol
+	SourcePos pos;	  ///< The source of the token (just positional data)
 };
 
 const extern std::unordered_map<std::string, Token::Type, FastStringHash> stringToTokenType;

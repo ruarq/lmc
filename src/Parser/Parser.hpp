@@ -29,7 +29,6 @@
 
 #include "../Lexer/Token.hpp"
 #include "../Logger.hpp"
-#include "../Tools.hpp"
 #include "Ast/Node.hpp"
 
 namespace Lm

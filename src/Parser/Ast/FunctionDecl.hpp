@@ -28,25 +28,17 @@
 #include <string>
 #include <vector>
 
+#include "../../Symbol.hpp"
 #include "Statement.hpp"
 
 namespace Lm::Ast
 {
 
-class FunctionDeclParamPack final
-{
-public:
-	bool isMut;
-	std::vector<std::string> names;
-	std::string type;
-};
-
 class FunctionDecl final : public Statement
 {
 public:
-	std::string name;
-	std::vector<FunctionDeclParamPack> paramPacks;
-	std::string type;
+	Symbol name;
+	Symbol type;
 };
 
 }

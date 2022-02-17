@@ -5,4 +5,6 @@ obj
 
 # files
 Makefile
+!tracy/profiler/build/unix/Makefile
 *.make
+Tracy-release

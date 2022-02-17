@@ -30,6 +30,7 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "Config.hpp"
 #include "FastStringHash.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
@@ -37,7 +38,6 @@
 #include "Logger.hpp"
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
-#include "Tools.hpp"
 
 using namespace std::string_literals;
 
@@ -130,10 +130,12 @@ int main(int argc, char **argv)
 		/**
 		 * Lexing
 		 */
-		Lm::Lexer lexer;
+		Lm::Lexer lexer(content);
 
 		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
-		const auto tokens = lexer.Run(content);
+
+		const auto tokens = lexer.Run();
+
 		LM_IGNORE_IN_RELEASE(
 			const auto lexingEnd = std::chrono::high_resolution_clock::now();
 			const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
@@ -145,7 +147,14 @@ int main(int argc, char **argv)
 			tokens.size(),
 			duration,
 			(double)(file.Size()) /
-				(duration.count() * 1048576.0));	// Conversion from B/s to MiB/s
+				(duration.count() * (double)(1 << 20)));	// Conversion from B/s to MiB/s
+
+		// for (const auto &token : tokens)
+		// {
+		// 	fmt::print("'{}' - {}\n",
+		// 		token.symbol ? token.symbol.String() : "No symbol",
+		// 		content.substr(token.offset, token.size));
+		// }
 
 		/**
 		 * Parsing

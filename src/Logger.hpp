@@ -83,32 +83,10 @@ public:
 	}
 
 	template<typename... Args>
-	static auto WarningFile(const std::string &filename,
-		const File::Pos &pos,
-		const std::string &fmt,
-		Args &&...args) -> void
-	{
-		Warning("{} {}",
-			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),
-			fmt::format(fmt, args...));
-	}
-
-	template<typename... Args>
 	static auto Error(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n",
 			fmt::format(fmt::fg(errorColor) | errorEmphasis, "{}:", Locale::Get("ERROR")),
-			fmt::format(fmt, args...));
-	}
-
-	template<typename... Args>
-	static auto ErrorFile(const std::string &filename,
-		const File::Pos &pos,
-		const std::string &fmt,
-		Args &&...args) -> void
-	{
-		Error("{} {}",
-			fmt::format(fileEmphasis, "{}:{}:{}:", filename, pos.line, pos.column),
 			fmt::format(fmt, args...));
 	}
 

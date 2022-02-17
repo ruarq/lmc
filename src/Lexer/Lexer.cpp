@@ -28,18 +28,21 @@
 namespace Lm
 {
 
-auto Lexer::Run(const std::string &source) -> std::vector<Token>
+Lexer::Lexer(const std::string &source)
+	: start(source.data())
+	, curr(start)
+	, end(source.data() + source.size())
 {
-	start = source.data();
-	curr = start;
-	end = source.data() + source.size();
+	pos = { .line = 1, .column = 0, .offset = 0 };
+}
 
+auto Lexer::Run() -> std::vector<Token>
+{
 	std::vector<Token> tokens;
+
 	while (curr < end)
 	{
-		auto token = NextToken();
-		token.offset = offset;
-		tokens.push_back(token);
+		tokens.push_back(NextToken());
 	}
 
 	return tokens;
@@ -47,9 +50,32 @@ auto Lexer::Run(const std::string &source) -> std::vector<Token>
 
 auto Lexer::NextToken() -> Lm::Token
 {
-NEXT_TOKEN:
+#if LM_LEXER_BUFFER_ENABLE
+	if (bufToken >= buffer.size())
+	{
+		bufToken = 0;
+		for (auto &token : buffer)
+		{
+			token = LexToken();
+			token.pos = pos;
+		}
+	}
 
-	offset = curr - start;
+	return buffer[bufToken++];
+#else
+	auto token = LexToken();
+	token.pos = pos;
+	return token;
+#endif
+}
+
+auto Lexer::LexToken() -> Lm::Token
+{
+LEX_TOKEN:
+
+	pos.line = line;
+	pos.column = column;
+	pos.offset = curr - start;
 
 	switch (*curr++)
 	{
@@ -57,16 +83,21 @@ NEXT_TOKEN:
 
 		// Skip whitespace
 		case ' ':
-		case '\n':
+		case '\n': ++line; [[fallthrough]];
 		case '\t':
 		case '\r':
 		case '\f':
-			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t' || *curr == '\r' ||
-									 *curr == '\f'))
+			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t'))
 			{
+				if (*curr == '\n')
+				{
+					column = 0;
+					++line;
+				}
+
 				++curr;
 			}
-			goto NEXT_TOKEN;
+			goto LEX_TOKEN;
 
 		// Skip comments
 		case '#':
@@ -74,7 +105,7 @@ NEXT_TOKEN:
 			{
 				++curr;
 			}
-			goto NEXT_TOKEN;
+			goto LEX_TOKEN;
 
 		case '0' ... '9':
 		{
