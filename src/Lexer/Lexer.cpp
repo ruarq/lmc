@@ -36,18 +36,6 @@ Lexer::Lexer(const std::string &source)
 	pos = { .line = 1, .column = 0, .offset = 0 };
 }
 
-auto Lexer::Run() -> std::vector<Token>
-{
-	std::vector<Token> tokens;
-
-	while (curr < end)
-	{
-		tokens.push_back(NextToken());
-	}
-
-	return tokens;
-}
-
 auto Lexer::NextToken() -> Lm::Token
 {
 #if LM_LEXER_BUFFER_ENABLE
@@ -69,9 +57,14 @@ auto Lexer::NextToken() -> Lm::Token
 #endif
 }
 
+auto Lexer::Eof() const -> bool
+{
+	return curr < end;
+}
+
 auto Lexer::LexToken() -> Lm::Token
 {
-LEX_TOKEN:
+L_LEX_TOKEN:
 
 	pos.line = line;
 	pos.column = column;
@@ -97,7 +90,7 @@ LEX_TOKEN:
 
 				++curr;
 			}
-			goto LEX_TOKEN;
+			goto L_LEX_TOKEN;
 
 		// Skip comments
 		case '#':
@@ -105,7 +98,7 @@ LEX_TOKEN:
 			{
 				++curr;
 			}
-			goto LEX_TOKEN;
+			goto L_LEX_TOKEN;
 
 		case '0' ... '9':
 		{
@@ -143,12 +136,7 @@ LEX_TOKEN:
 			}
 
 			std::string symbol(tokStart, curr);
-			auto type = Token::Type::Ident;
-
-			if (stringToTokenType.find(symbol) != stringToTokenType.end())
-			{
-				type = stringToTokenType.at(symbol);
-			}
+			auto type = GetKeywordType(symbol);
 
 			if (type == Token::Type::Ident)
 			{
@@ -354,6 +342,7 @@ LEX_TOKEN:
 		default: break;
 	}
 
-	return Token::Type::Unknown;
+	// TODO(ruarq): Error
+	goto L_LEX_TOKEN;
 }
 }

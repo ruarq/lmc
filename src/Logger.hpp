@@ -47,7 +47,7 @@ class Logger final
 public:
 	static constexpr auto debugColor = fmt::color::yellow;
 
-	static constexpr auto infoColor = fmt::color::green;
+	static constexpr auto infoColor = fmt::color::green_yellow;
 
 	static constexpr auto warningColor = fmt::color::violet;
 	static constexpr auto warningEmphasis = fmt::emphasis::bold;
@@ -69,9 +69,7 @@ public:
 	template<typename... Args>
 	static auto Info(const std::string &fmt, Args &&...args) -> void
 	{
-		fmt::print("{} {}\n",
-			fmt::format(fmt::fg(infoColor), "{}:", Locale::Get("INFO")),
-			fmt::format(fmt, args...));
+		fmt::print("{} {}\n", fmt::format(fmt::fg(infoColor), "[INFO]"), fmt::format(fmt, args...));
 	}
 
 	template<typename... Args>

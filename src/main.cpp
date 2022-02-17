@@ -31,7 +31,6 @@
 #include <fmt/format.h>
 
 #include "Config.hpp"
-#include "FastStringHash.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
@@ -55,6 +54,9 @@ int main(int argc, char **argv)
 	// array.
 	std::string helpText;
 
+	// Whether benchmarking should be done or not
+	bool benchmark = false;
+
 	const std::vector<Lm::Opt::Option> options = {
 	// clang-format off
 		{
@@ -76,6 +78,15 @@ int main(int argc, char **argv)
 				std::exit(0);
 			},
 			Lm::Locale::Get("HELP_LOCALE_DESCRIPTION")
+		},
+		{
+			"benchmark",
+			Lm::Opt::Option::noShortOption,
+			Lm::Opt::Option::Argument::None,
+			[&benchmark](const std::string &) {
+				benchmark = true;
+			},
+			Lm::Locale::Get("HELP_BENCHMARK_DESCRIPTION")
 		},
 		{
 			"help",
@@ -132,22 +143,26 @@ int main(int argc, char **argv)
 		 */
 		Lm::Lexer lexer(content);
 
-		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
+		if (benchmark)
+		{
+			const auto start = std::chrono::high_resolution_clock::now();
+			while (lexer.NextToken().type != Lm::Token::Type::Eof)
+				;
 
-		const auto tokens = lexer.Run();
+			const auto end = std::chrono::high_resolution_clock::now();
 
-		LM_IGNORE_IN_RELEASE(
-			const auto lexingEnd = std::chrono::high_resolution_clock::now();
-			const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
+			const auto duration = std::chrono::duration<double>(end - start);
+
+			Lm::Logger::Info("{}: - {} - {:.2f} MiB/s",
+				file.Name(),
+				duration,
+				(double)(file.Size()) / (duration.count() * (double)(1 << 20)));
+		}
+		else
+		{
+		}
 
 		Lm::Symbol::DropHashmap();
-
-		LM_DEBUG("{}: - {} token(s) - {} - {:.2f} MiB/s",
-			file.Name(),
-			tokens.size(),
-			duration,
-			(double)(file.Size()) /
-				(duration.count() * (double)(1 << 20)));	// Conversion from B/s to MiB/s
 
 		// for (const auto &token : tokens)
 		// {

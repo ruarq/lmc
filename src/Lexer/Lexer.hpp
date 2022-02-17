@@ -43,14 +43,14 @@ public:
 
 public:
 	/**
-	 * @brief Lex the whole source in one pass and generate a list of tokens
-	 */
-	auto Run() -> std::vector<Token>;
-
-	/**
 	 * @brief Get the next token
 	 */
 	auto NextToken() -> Token;
+
+	/**
+	 * @return True if eof
+	 */
+	auto Eof() const -> bool;
 
 private:
 	/**

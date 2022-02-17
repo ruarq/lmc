@@ -30,7 +30,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "FastStringHash.hpp"
+#include "Hashes/MurmurHash.hpp"
 
 namespace Lm
 {
@@ -48,7 +48,7 @@ public:
 
 public:
 	static std::vector<std::string> pool;
-	static std::unordered_map<std::string, symbol_id_t, FastStringHash> stringToId;
+	static std::unordered_map<std::string, symbol_id_t, MurmurHash> stringToId;
 
 public:
 	Symbol() = default;

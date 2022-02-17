@@ -14,7 +14,7 @@ then
 	for ((i = 1; i <= $iters; ++i))
 	do
 		echo "==== Running test $i ===="
-		bin/$1/lmc $(find perf_tests/$2 -name "*.lm")
+		bin/$1/lmc --benchmark $(find perf_tests/$2 -name "*.lm")
 	done
 else
 	echo "No such file or directory"
