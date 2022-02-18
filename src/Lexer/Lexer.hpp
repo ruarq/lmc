@@ -64,7 +64,8 @@ private:
 	const char *end;
 
 	SourcePos pos;
-	size_t line, column;
+	line_t line;
+	column_t column;
 
 #if LM_LEXER_BUFFER_ENABLE
 	size_t bufToken = LM_LEXER_BUFFER_SIZE;

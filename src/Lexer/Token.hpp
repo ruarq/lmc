@@ -32,11 +32,15 @@
 namespace Lm
 {
 
+using line_t = unsigned long;
+using column_t = unsigned long;
+using offset_t = unsigned long;
+
 struct SourcePos final
 {
-	size_t line;
-	size_t column;
-	size_t offset;
+	line_t line;
+	column_t column;
+	offset_t offset;
 };
 
 /**

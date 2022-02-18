@@ -32,8 +32,10 @@ Lexer::Lexer(const std::string &source)
 	: start(source.data())
 	, curr(start)
 	, end(source.data() + source.size())
+	, pos({ .line = 1, .column = 0, .offset = 0 })
+	, line(1)
+	, column(0)
 {
-	pos = { .line = 1, .column = 0, .offset = 0 };
 }
 
 auto Lexer::NextToken() -> Lm::Token
