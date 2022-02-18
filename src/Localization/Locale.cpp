@@ -70,6 +70,11 @@ auto Locale::Encoding() -> std::string
 	return lang.substr(lang.find_last_of('.') + 1);
 }
 
+auto Locale::Default() -> std::string
+{
+	return "en_US.UTF-8";
+}
+
 auto Locale::LoadFromFile(const std::string &filename) -> bool
 {
 	auto ParseLine = [](const std::string &line) {
