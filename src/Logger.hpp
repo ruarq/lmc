@@ -30,6 +30,8 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 
+#include "Localization/Locale.hpp"
+
 #ifdef DEBUG
 	#define LM_DEBUG(fmt, ...) Lm::Logger::Debug(fmt, __VA_ARGS__)
 #else
@@ -44,6 +46,7 @@ class Logger final
 public:
 	static constexpr auto debugColor = fmt::color::yellow;
 	static constexpr auto infoColor = fmt::color::green_yellow;
+	static constexpr auto errorColor = fmt::color::red;
 
 public:
 	/**
@@ -64,6 +67,17 @@ public:
 	static auto Info(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n", fmt::format(fmt::fg(infoColor), "[INFO]"), fmt::format(fmt, args...));
+	}
+
+	/**
+	 * @brief Log a error message
+	 */
+	template<typename... Args>
+	static auto Error(const std::string &fmt, Args &&...args) -> void
+	{
+		fmt::print("{} {}\n",
+			fmt::format(fmt::fg(errorColor), "{}:", Locale::Get("ERROR")),
+			fmt::format(fmt, args...));
 	}
 };
 

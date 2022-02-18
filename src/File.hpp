@@ -28,6 +28,8 @@
 #include <cstdio>
 #include <string>
 
+#include "Macros.hpp"
+
 namespace Lm
 {
 

@@ -30,13 +30,14 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include "Config.hpp"
+#include "Macros.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Logger.hpp"
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
+#include "Diagnostics.hpp"
 
 using namespace std::string_literals;
 
@@ -148,10 +149,18 @@ int main(int argc, char **argv)
 	{
 		Lm::File file(filename);
 
+		if (!file.Buf())
+		{
+			// TODO(ruarq): Make fatal error out of this
+			Lm::Logger::Error(Lm::Locale::Get("FATAL_NO_SUCH_FILE_OR_DIRECTORY"), filename);
+			return 1;
+		}
+
 		/**
 		 * Lexing
 		 */
-		Lm::Lexer lexer(file.Buf(), file.Buf() + file.Size());
+		Lm::Diagnostics diagnostics(file);
+		Lm::Lexer lexer(file, diagnostics);
 
 		if (benchmark)
 		{
@@ -170,6 +179,8 @@ int main(int argc, char **argv)
 		}
 		else
 		{
+			while (lexer.NextToken().type != Lm::Token::Type::Eof)
+				;
 		}
 
 		Lm::Symbol::DropHashmap();

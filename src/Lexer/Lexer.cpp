@@ -25,16 +25,20 @@
 
 #include "Lexer.hpp"
 
+#define COLUMN_START 1
+#define LINE_START 1
+
 namespace Lm
 {
 
-Lexer::Lexer(const char *source, const char *sourceEnd)
-	: start(source)
+Lexer::Lexer(const File &file, const Diagnostics &diagnostics)
+	: start(file.Buf())
 	, curr(start)
-	, end(sourceEnd)
-	, pos({ .line = 1, .column = 0, .offset = 0 })
-	, line(1)
-	, column(0)
+	, end(file.Buf() + file.Size())
+	, pos({ .line = LINE_START, .column = COLUMN_START, .offset = 0 })
+	, line(LINE_START)
+	, column(COLUMN_START)
+	, diagnostics(diagnostics)
 {
 }
 
@@ -61,38 +65,49 @@ auto Lexer::NextToken() -> Lm::Token
 
 auto Lexer::Eof() const -> bool
 {
-	return curr < end;
+	return curr >= end;
 }
 
 auto Lexer::LexToken() -> Lm::Token
 {
 L_LEX_TOKEN:
 
+	if (Eof())
+	{
+		return Token::Type::Eof;
+	}
+
 	pos.line = line;
 	pos.column = column;
 	pos.offset = curr - start;
 
+	++column;
 	switch (*curr++)
 	{
-		case '\0': return Token::Type::Eof;
-
 		// Skip whitespace
+		case '\n':
+			++line;
+			column = COLUMN_START;
+			[[fallthrough]];
 		case ' ':
-		case '\n': ++line; [[fallthrough]];
 		case '\t':
 		case '\r':
 		case '\f':
+		{
+			const auto prev = curr;
 			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t'))
 			{
 				if (*curr == '\n')
 				{
-					column = 0;
+					column = COLUMN_START;
 					++line;
 				}
 
 				++curr;
 			}
+			column += curr - prev;
 			goto L_LEX_TOKEN;
+		}
 
 		// Skip comments
 		case '#':
@@ -100,6 +115,9 @@ L_LEX_TOKEN:
 			{
 				++curr;
 			}
+			++curr;	   // Whitespace
+			column = COLUMN_START;
+			++line;
 			goto L_LEX_TOKEN;
 
 		case '0' ... '9':
@@ -122,6 +140,7 @@ L_LEX_TOKEN:
 				}
 			}
 
+			column += curr - tokStart - 1;
 			return Token(type, std::string(tokStart, curr));
 		}
 
@@ -130,12 +149,15 @@ L_LEX_TOKEN:
 		case '_':
 		{
 			const auto tokStart = curr - 1;
+
 			while (
 				curr < end && ((*curr >= 'A' && *curr <= 'Z') || (*curr >= 'a' && *curr <= 'z') ||
 								  (*curr >= '0' && *curr <= '9') || (*curr == '_')))
 			{
 				++curr;
 			}
+
+			column += curr - tokStart - 1;
 
 			std::string symbol(tokStart, curr);
 
@@ -150,15 +172,19 @@ L_LEX_TOKEN:
 
 		case '"':
 		{
-			const auto tokStart = curr;
+			const auto tokStart = curr - 1;
 			while (curr < end && *curr != '"' && *curr != '\n')
 			{
 				++curr;
 			}
-			if (*++curr != '"')
+
+			if (*curr++ != '"')
 			{
-				// TODO(ruarq): error
+				diagnostics.Error(pos, Locale::Get("LEXER_ERROR_UNTERMINATED_STRING"));
 			}
+
+			column += curr - tokStart - 1;
+
 			return Token(Token::Type::StringLiteral, std::string(tokStart, curr - 1));
 		}
 
@@ -167,7 +193,7 @@ L_LEX_TOKEN:
 			std::string symbol = { *curr++ };
 			if (*curr != '\'')
 			{
-				// TODO(ruarq): error
+				diagnostics.Error(pos, Locale::Get("LEXER_ERROR_UNTERMINATED_CHAR"));
 			}
 			return Token(Token::Type::CharLiteral, std::move(symbol));
 		}
@@ -187,12 +213,12 @@ L_LEX_TOKEN:
 		case '-':
 			if (*curr == '>')
 			{
-				++curr;
+				Next();
 				return Token::Type::Arrow;
 			}
 			else if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::MinusEqual;
 			}
 			return Token::Type::Minus;
@@ -200,12 +226,12 @@ L_LEX_TOKEN:
 		case '=':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::Equal;
 			}
 			else if (*curr == '>')
 			{
-				++curr;
+				Next();
 				return Token::Type::WideArrow;
 			}
 			return Token::Type::Assign;
@@ -213,7 +239,7 @@ L_LEX_TOKEN:
 		case ':':
 			if (*curr == ':')
 			{
-				++curr;
+				Next();
 				return Token::Type::ColonColon;
 			}
 			return Token::Type::Colon;
@@ -221,12 +247,12 @@ L_LEX_TOKEN:
 		case '+':
 			if (*curr == '+')
 			{
-				++curr;
+				Next();
 				return Token::Type::PlusEqual;
 			}
 			else if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::Plus;
 			}
 			return Token::Type::Plus;
@@ -234,7 +260,7 @@ L_LEX_TOKEN:
 		case '*':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::StarEqual;
 			}
 			return Token::Type::Star;
@@ -242,7 +268,7 @@ L_LEX_TOKEN:
 		case '/':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::SlashEqual;
 			}
 			return Token::Type::Slash;
@@ -250,7 +276,7 @@ L_LEX_TOKEN:
 		case '%':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::ModEqual;
 			}
 			return Token::Type::Mod;
@@ -258,7 +284,7 @@ L_LEX_TOKEN:
 		case '!':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::NotEqual;
 			}
 			return Token::Type::Not;
@@ -266,17 +292,17 @@ L_LEX_TOKEN:
 		case '<':
 			if (*curr == '<')
 			{
-				++curr;
+				Next();
 				if (*curr == '=')
 				{
-					++curr;
+					Next();
 					return Token::Type::LShiftEqual;
 				}
 				return Token::Type::LShift;
 			}
 			else if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::LessEqual;
 			}
 			return Token::Type::Less;
@@ -284,10 +310,10 @@ L_LEX_TOKEN:
 		case '>':
 			if (*curr == '>')
 			{
-				++curr;
+				Next();
 				if (*curr == '=')
 				{
-					++curr;
+					Next();
 					return Token::Type::RShiftEqual;
 				}
 				return Token::Type::RShift;
@@ -302,12 +328,12 @@ L_LEX_TOKEN:
 		case '&':
 			if (*curr == '&')
 			{
-				++curr;
+				Next();
 				return Token::Type::AndAnd;
 			}
 			else if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::AndEqual;
 			}
 			return Token::Type::And;
@@ -315,12 +341,12 @@ L_LEX_TOKEN:
 		case '|':
 			if (*curr == '|')
 			{
-				++curr;
+				Next();
 				return Token::Type::OrOr;
 			}
 			else if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::OrEqual;
 			}
 			return Token::Type::Or;
@@ -328,7 +354,7 @@ L_LEX_TOKEN:
 		case '^':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::XorEqual;
 			}
 			return Token::Type::Xor;
@@ -336,7 +362,7 @@ L_LEX_TOKEN:
 		case '~':
 			if (*curr == '=')
 			{
-				++curr;
+				Next();
 				return Token::Type::FlipEqual;
 			}
 			return Token::Type::Flip;
@@ -344,7 +370,14 @@ L_LEX_TOKEN:
 		default: break;
 	}
 
-	// TODO(ruarq): Error
+	diagnostics.Error(pos, fmt::format(Locale::Get("LEXER_ERROR_UNKNOWN_TOKEN"), *curr));
 	goto L_LEX_TOKEN;
 }
+
+auto Lexer::Next() -> void
+{
+	++curr;
+	++column;
+}
+
 }

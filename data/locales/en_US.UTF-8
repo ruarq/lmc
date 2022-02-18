@@ -2,6 +2,8 @@ WARNING													warning
 ERROR													error
 FATAL_ERROR												fatal error
 
+FATAL_NO_SUCH_FILE_OR_DIRECTORY							no such file or directory: '{}'
+
 USAGE_STRING											Usage: {} [options] file...
 OPTIONS													Options
 

@@ -32,6 +32,7 @@ namespace Lm
 
 File::File(const std::string &filename)
 	: name(filename)
+	, buf(nullptr)
 {
 	file = fopen(filename.c_str(), "r");
 	if (!file)
@@ -44,8 +45,7 @@ File::File(const std::string &filename)
 	size = ftell(file);
 	rewind(file);
 
-	buf = new char[size + 1];
-	buf[size] = '\0';
+	buf = new char[size];
 	fread(buf, sizeof(char), size, file);
 }
 
@@ -71,7 +71,7 @@ auto File::Name() const -> std::string
 
 auto File::Size() const -> size_t
 {
-	return size + 1; // in File::File(const std::string &) we allocate size + 1 because of the null-terminator
+	return size;
 }
 
 }

@@ -2,6 +2,8 @@ WARNING													Warnung
 ERROR													Fehler
 FATAL_ERROR												fataler Fehler
 
+FATAL_NO_SUCH_FILE_OR_DIRECTORY							missing translation '{}'
+
 USAGE_STRING											Aufruf: {} [Optionen] Datei...
 OPTIONS													Optionen
 

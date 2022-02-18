@@ -30,7 +30,12 @@
 #include <string>
 #include <vector>
 
-#include "../Config.hpp"
+#include <fmt/format.h>
+
+#include "../Diagnostics.hpp"
+#include "../File.hpp"
+#include "../Logger.hpp"
+#include "../Macros.hpp"
 #include "Token.hpp"
 
 namespace Lm
@@ -39,7 +44,7 @@ namespace Lm
 class Lexer final
 {
 public:
-	Lexer(const char *source, const char *sourceEnd);
+	Lexer(const File &file, const Diagnostics &diagnostics);
 
 public:
 	/**
@@ -58,6 +63,11 @@ private:
 	 */
 	auto LexToken() -> Token;
 
+	/**
+	 * @brief Next char
+	 */
+	inline auto Next() -> void;
+
 private:
 	const char *start;
 	const char *curr;
@@ -66,6 +76,8 @@ private:
 	SourcePos pos;
 	line_t line;
 	column_t column;
+
+	Diagnostics diagnostics;
 
 #if LM_LEXER_BUFFER_ENABLE
 	size_t bufToken = LM_LEXER_BUFFER_SIZE;
