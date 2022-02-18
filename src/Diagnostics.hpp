@@ -61,6 +61,15 @@ private:
 	 */
 	auto LoadLine(const SourcePos &pos) const -> std::string;
 
+	/**
+	 * @brief Helper function
+	 */
+	auto Here(const std::string &line,
+		const column_t from,
+		const column_t to,
+		const char pointer,
+		const char underline) const -> void;
+
 private:
 	const File &file;
 };

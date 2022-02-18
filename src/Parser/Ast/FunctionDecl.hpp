@@ -37,7 +37,7 @@ namespace Lm::Ast
 class FunctionDecl final : public Statement
 {
 public:
-	Symbol name;
+	Symbol ident;
 	Symbol type;
 };
 

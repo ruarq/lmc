@@ -42,28 +42,15 @@ auto Diagnostics::Error(const SourcePos &where, const std::string &what) const -
 		what,
 		line);
 
-	std::string pointer;
-	for (column_t i = 0; i < where.column - 1; ++i)
-	{
-		if (line[i] == '\t')
-		{
-			pointer += "\t";
-		}
-		else
-		{
-			pointer += "~";
-		}
-	}
-	fmt::print(fmt::fg(fmt::color::green_yellow), "{}^\n", pointer);
+	Here(line, where.column, where.column, '^', '~');
 }
-
 auto Diagnostics::LoadLine(const SourcePos &pos) const -> std::string
 {
 	auto start = file.Buf() + pos.offset;
 	auto end = start;
 
 	// find the start of the line
-	while (*start != '\n')
+	while (*start != '\n' && start >= file.Buf())
 	{
 		--start;
 	}
@@ -76,6 +63,41 @@ auto Diagnostics::LoadLine(const SourcePos &pos) const -> std::string
 	}
 
 	return std::string(start, end);
+}
+
+auto Diagnostics::Here(const std::string &line,
+	const column_t from,
+	const column_t to,
+	const char pointer,
+	const char underline) const -> void
+{
+	std::string pre;
+	for (column_t i = 0; i < from - 1; ++i)
+	{
+		if (line[i] == '\t')
+		{
+			pre += "\t";
+		}
+		else
+		{
+			pre += underline;
+		}
+	}
+
+	std::string post;
+	for (column_t i = from; i < to; ++i)
+	{
+		if (line[i] == '\t')
+		{
+			post += "\t";
+		}
+		else
+		{
+			post += underline;
+		}
+	}
+
+	fmt::print(fmt::fg(fmt::color::green_yellow), "{}{}{}\n", pre, pointer, post);
 }
 
 }

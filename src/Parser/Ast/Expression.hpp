@@ -22,3 +22,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
+
+#pragma once
+
+#include "Node.hpp"
+
+namespace Lm::Ast
+{
+
+class Expression : public Node
+{
+public:
+	virtual ~Expression() = default;
+};
+
+}

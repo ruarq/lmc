@@ -48,10 +48,10 @@ auto Lexer::NextToken() -> Lm::Token
 	if (bufToken >= buffer.size())
 	{
 		bufToken = 0;
-		for (auto &token : buffer)
+		for (auto token = buffer.begin(); token != buffer.end() && !Eof(); ++token)
 		{
-			token = LexToken();
-			token.pos = pos;
+			*token = LexToken();
+			token->pos = pos;
 		}
 	}
 

@@ -26,12 +26,12 @@
 #pragma once
 
 #include "../../Symbol.hpp"
-#include "Node.hpp"
+#include "Expression.hpp"
 
 namespace Lm::Ast
 {
 
-class Identifier final : public Node
+class Identifier final : public Expression
 {
 public:
 	Symbol symbol;

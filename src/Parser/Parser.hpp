@@ -52,7 +52,7 @@ private:
 	/**
 	 * @brief Consume a specific token type
 	 */
-	auto Consume(const Token::Type type) -> void;
+	auto Consume(const Token::Type type, const std::string &expected) -> void;
 
 private:
 	Lexer &lexer;
