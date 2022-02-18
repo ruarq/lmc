@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "Node.hpp"
+#include "Statement.hpp"
 
 namespace Lm::Ast
 {
@@ -35,7 +36,10 @@ namespace Lm::Ast
 class TranslationUnit final : public Node
 {
 public:
-	std::vector</* Some DeclarationStatement type */ int> statements;
+	~TranslationUnit();
+
+public:
+	std::vector<Statement *> statements;
 };
 
 }

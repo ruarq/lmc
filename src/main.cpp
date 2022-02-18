@@ -30,14 +30,14 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include "Macros.hpp"
+#include "Diagnostics.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Logger.hpp"
+#include "Macros.hpp"
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
-#include "Diagnostics.hpp"
 
 using namespace std::string_literals;
 
@@ -161,15 +161,16 @@ int main(int argc, char **argv)
 		 */
 		Lm::Diagnostics diagnostics(file);
 		Lm::Lexer lexer(file, diagnostics);
+		Lm::Parser parser(lexer, diagnostics);
+		Lm::Ast::TranslationUnit *unit = nullptr;
 
 		if (benchmark)
 		{
 			const auto start = std::chrono::high_resolution_clock::now();
-			while (lexer.NextToken().type != Lm::Token::Type::Eof)
-				;
-
+			{
+				unit = parser.Run();
+			}
 			const auto end = std::chrono::high_resolution_clock::now();
-
 			const auto duration = std::chrono::duration<double>(end - start);
 
 			Lm::Logger::Info("{}: - {} - {:.2f} MiB/s",
@@ -179,11 +180,12 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			while (lexer.NextToken().type != Lm::Token::Type::Eof)
-				;
+			unit = parser.Run();
 		}
 
 		Lm::Symbol::DropHashmap();
+
+		delete unit;
 
 		// for (const auto &token : tokens)
 		// {

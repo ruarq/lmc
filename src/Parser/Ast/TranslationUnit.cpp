@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 18.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,59 +23,19 @@
  * IN THE SOFTWARE.
  */
 
-#include "Parser.hpp"
+#include "TranslationUnit.hpp"
 
-namespace Lm
+namespace Lm::Ast
 {
 
-Parser::Parser(Lexer &lexer, const Diagnostics &diagnostics)
-	: lexer(lexer)
-	, diagnostics(diagnostics)
+TranslationUnit::~TranslationUnit()
 {
-}
-
-auto Parser::Run() -> Ast::TranslationUnit *
-{
-	auto unit = new Ast::TranslationUnit();
-	while ((curr = lexer.NextToken()).type != Token::Type::Eof)
+	for (auto stmt : statements)
 	{
-		unit->statements.push_back(GlobalStmt());
-	}
-	return unit;
-}
-
-auto Parser::GlobalStmt() -> Ast::Statement *
-{
-	switch (curr.type)
-	{
-		case Token::Type::Fn: return FunctionDecl();
-		default: diagnostics.Error(curr.pos, "Unexpected token"); return nullptr;
-	}
-}
-
-auto Parser::FunctionDecl() -> Ast::FunctionDecl *
-{
-	auto fn = new Ast::FunctionDecl();
-	Consume(Token::Type::Ident);
-
-	fn->name = curr.symbol;
-	fn->type = Symbol("void");
-
-	Consume(Token::Type::LParen);
-	Consume(Token::Type::RParen);
-	Consume(Token::Type::LCurly);
-	Consume(Token::Type::RCurly);
-
-	return fn;
-}
-
-auto Parser::Consume(const Token::Type type) -> void
-{
-	curr = lexer.NextToken();
-
-	if (curr.type != type)
-	{
-		diagnostics.Error(curr.pos, "Unexpected token type");
+		if (stmt)
+		{
+			delete stmt;
+		}
 	}
 }
 

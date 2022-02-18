@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include "../../File.hpp"
+#include "../../Symbol.hpp"
 #include "Node.hpp"
 
 namespace Lm::Ast
@@ -34,7 +34,7 @@ namespace Lm::Ast
 class Identifier final : public Node
 {
 public:
-	File::Loc loc;
+	Symbol symbol;
 };
 
 }

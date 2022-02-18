@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include "../../Lexer/Token.hpp"
+
 namespace Lm::Ast
 {
 
@@ -32,6 +34,9 @@ class Node
 {
 public:
 	virtual ~Node() = default;
+
+public:
+	SourcePos pos;
 };
 
 }

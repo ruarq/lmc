@@ -27,9 +27,12 @@
 
 #include <vector>
 
+#include "../Diagnostics.hpp"
+#include "../Lexer/Lexer.hpp"
 #include "../Lexer/Token.hpp"
-#include "../Logger.hpp"
+#include "Ast/FunctionDecl.hpp"
 #include "Ast/Node.hpp"
+#include "Ast/TranslationUnit.hpp"
 
 namespace Lm
 {
@@ -37,10 +40,24 @@ namespace Lm
 class Parser final
 {
 public:
-	auto Run(const std::vector<Token> &tokens) -> Ast::Node *;
+	Parser(Lexer &lexer, const Diagnostics &diagnostics);
+
+public:
+	auto Run() -> Ast::TranslationUnit *;
 
 private:
-	const std::vector<Token> *tokens;
+	auto GlobalStmt() -> Ast::Statement *;
+	auto FunctionDecl() -> Ast::FunctionDecl *;
+
+	/**
+	 * @brief Consume a specific token type
+	 */
+	auto Consume(const Token::Type type) -> void;
+
+private:
+	Lexer &lexer;
+	const Diagnostics &diagnostics;
+	Token curr;
 };
 
 }
