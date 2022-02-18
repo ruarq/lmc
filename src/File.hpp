@@ -46,9 +46,9 @@ public:
 	~File();
 
 	/**
-	 * @brief Reads the file
+	 * @brief Get the file buffer
 	 */
-	auto Read() const -> std::string;
+	auto Buf() const -> const char *;
 
 	auto Name() const -> std::string;
 	auto Size() const -> size_t;
@@ -56,6 +56,8 @@ public:
 private:
 	FILE *file;
 	std::string name;
+
+	char *buf;
 	size_t size;
 };
 

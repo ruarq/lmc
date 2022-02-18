@@ -39,7 +39,7 @@ namespace Lm
 class Lexer final
 {
 public:
-	Lexer(const std::string &source);
+	Lexer(const char *source, const char *sourceEnd);
 
 public:
 	/**

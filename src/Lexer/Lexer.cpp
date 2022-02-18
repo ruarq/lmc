@@ -28,10 +28,10 @@
 namespace Lm
 {
 
-Lexer::Lexer(const std::string &source)
-	: start(source.data())
+Lexer::Lexer(const char *source, const char *sourceEnd)
+	: start(source)
 	, curr(start)
-	, end(source.data() + source.size())
+	, end(sourceEnd)
 	, pos({ .line = 1, .column = 0, .offset = 0 })
 	, line(1)
 	, column(0)

@@ -30,9 +30,6 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 
-#include "File.hpp"
-#include "Localization/Locale.hpp"
-
 #ifdef DEBUG
 	#define LM_DEBUG(fmt, ...) Lm::Logger::Debug(fmt, __VA_ARGS__)
 #else
@@ -46,18 +43,12 @@ class Logger final
 {
 public:
 	static constexpr auto debugColor = fmt::color::yellow;
-
 	static constexpr auto infoColor = fmt::color::green_yellow;
 
-	static constexpr auto warningColor = fmt::color::violet;
-	static constexpr auto warningEmphasis = fmt::emphasis::bold;
-
-	static constexpr auto errorColor = fmt::color::red;
-	static constexpr auto errorEmphasis = fmt::emphasis::bold;
-
-	static constexpr auto fileEmphasis = fmt::emphasis::bold;
-
 public:
+	/**
+	 * @brief Log a debug message
+	 */
 	template<typename... Args>
 	static auto Debug(const std::string &fmt, Args &&...args) -> void
 	{
@@ -66,30 +57,14 @@ public:
 			fmt::format(fmt, args...));
 	}
 
+	/**
+	 * @brief Log some (arbitrary) information
+	 */
 	template<typename... Args>
 	static auto Info(const std::string &fmt, Args &&...args) -> void
 	{
 		fmt::print("{} {}\n", fmt::format(fmt::fg(infoColor), "[INFO]"), fmt::format(fmt, args...));
 	}
-
-	template<typename... Args>
-	static auto Warning(const std::string &fmt, Args &&...args) -> void
-	{
-		fmt::print("{} {}\n",
-			fmt::format(fmt::fg(warningColor) | warningEmphasis, "{}:", Locale::Get("WARNING")),
-			fmt::format(fmt, args...));
-	}
-
-	template<typename... Args>
-	static auto Error(const std::string &fmt, Args &&...args) -> void
-	{
-		fmt::print("{} {}\n",
-			fmt::format(fmt::fg(errorColor) | errorEmphasis, "{}:", Locale::Get("ERROR")),
-			fmt::format(fmt, args...));
-	}
-
-private:
-	static std::string programPath;
 };
 
 }

@@ -147,12 +147,11 @@ int main(int argc, char **argv)
 	for (const auto &filename : filenames)
 	{
 		Lm::File file(filename);
-		const std::string content = file.Read();
 
 		/**
 		 * Lexing
 		 */
-		Lm::Lexer lexer(content);
+		Lm::Lexer lexer(file.Buf(), file.Buf() + file.Size());
 
 		if (benchmark)
 		{

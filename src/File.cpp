@@ -42,20 +42,26 @@ File::File(const std::string &filename)
 
 	fseek(file, 0, SEEK_END);
 	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
+	rewind(file);
+
+	buf = new char[size + 1];
+	buf[size] = '\0';
+	fread(buf, sizeof(char), size, file);
 }
 
 File::~File()
 {
+	if (buf)
+	{
+		delete[] buf;
+	}
+
 	fclose(file);
 }
 
-auto File::Read() const -> std::string
+auto File::Buf() const -> const char *
 {
-	std::string content(size + 1, '\0');
-	content.back() = '\n';
-	fread(content.data(), sizeof(char), size, file);
-	return content;
+	return buf;
 }
 
 auto File::Name() const -> std::string
@@ -65,7 +71,7 @@ auto File::Name() const -> std::string
 
 auto File::Size() const -> size_t
 {
-	return size;
+	return size + 1; // in File::File(const std::string &) we allocate size + 1 because of the null-terminator
 }
 
 }
