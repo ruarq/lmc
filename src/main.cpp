@@ -40,6 +40,16 @@
 
 using namespace std::string_literals;
 
+auto LoadLocale() -> void
+{
+	auto locale = Lm::Locale::Full();
+	if (locale.empty())
+	{
+		locale = Lm::Locale::Default();
+	}
+	Lm::Locale::LoadFromFile("data/locales/"s + locale);
+}
+
 // TODO(ruarq): File a bug report about this, clang format formats
 // "auto main(int argc, char **argv) -> int"
 // to
@@ -47,7 +57,7 @@ using namespace std::string_literals;
 // auto main(int argc, char **argv) -> int
 int main(int argc, char **argv)
 {
-	Lm::Locale::LoadFromFile("data/locales/"s + Lm::Locale::Full());
+	LoadLocale();
 
 	// We need the help text in the "help" option, but
 	// we can only generate it after declaring the option
@@ -106,6 +116,7 @@ int main(int argc, char **argv)
 	// Generate help text
 	helpText = Lm::Opt::GenerateHelpText(options);
 
+	// Remove duplicates
 	auto RemoveDups = [](auto &list) {
 		const auto copy = std::move(list);
 
