@@ -1,4 +1,3 @@
-INFO													Info
 WARNING													Warnung
 ERROR													Fehler
 FATAL_ERROR												fataler Fehler
@@ -12,4 +11,5 @@ LEXER_ERROR_UNTERMINATED_CHAR							Char wurde nicht terminiert
 
 HELP_VERSION_DESCRIPTION								Compilerversioninformationen anzeigen
 HELP_LOCALE_DESCRIPTION									Die genutzte Lokalisierung anzeigen
+HELP_BENCHMARK_DESCRIPTION								Benchmarks der internen Komponenten des Compilers anzeigen
 HELP_HELP_DESCRIPTION									Diese Informationen anzeigen

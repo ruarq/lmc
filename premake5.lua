@@ -1,5 +1,5 @@
 workspace "lmc"
-	configurations { "debug", "release" }
+	configurations { "debug", "release", "tracy" }
 
 project "lmc"
 	kind "ConsoleApp"
@@ -18,4 +18,10 @@ project "lmc"
 
 	filter { "configurations:release" }
 		optimize "Speed"
-		defines { "DEBUG" }
+
+	filter { "configurations:tracy" }
+		optimize "Speed"
+		symbols "On"
+		files { "tracy/TracyClient.cpp" }
+		defines { "TRACY_ENABLE", "TRACY_NO_EXIT=1" }
+		links { "pthread", "dl" }

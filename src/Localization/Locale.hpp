@@ -60,7 +60,11 @@ public:
 	 */
 	static auto Encoding() -> std::string;
 
-public:
+	/**
+	 * @brief Get the default locale
+	 */
+	static auto Default() -> std::string;
+
 	/**
 	 * @brief Load the locale from a file
 	 * @return Whether loading was successful or not

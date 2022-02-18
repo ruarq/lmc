@@ -28,10 +28,16 @@
 #include <cstdint>
 
 #include "../Symbol.hpp"
-#include "../FastStringHash.hpp"
 
 namespace Lm
 {
+
+struct SourcePos final
+{
+	size_t line;
+	size_t column;
+	size_t offset;
+};
 
 /**
  * @brief stores all information about a lexical token
@@ -93,37 +99,37 @@ public:
 		Attribute,		 ///< @
 
 		Fn,			 ///< fn
-		Mut,		 ///< mut
-		Let,		 ///< let
-		Ret,		 ///< ret
-		Module,		 ///< module
-		Import,		 ///< import
-		Struct,		 ///< struct
-		Local,		 ///< local
-		Match,		 ///< match
-		For,		 ///< for
-		Loop,		 ///< loop
-		If,			 ///< if
-		Elif,		 ///< elif
-		Else,		 ///< else
-		Break,		 ///< break
-		Continue,	 ///< continue
 		Int8,		 ///< i8
+		If,			 ///< if
 		UInt8,		 ///< u8
-		Int16,		 ///< i16
-		UInt16,		 ///< u16
-		Int32,		 ///< i32
-		UInt32,		 ///< u32
-		Int64,		 ///< i64
-		UInt64,		 ///< u64
 		Float32,	 ///< f32
 		Float64,	 ///< f64
-		Long,		 ///< long
-		ULong,		 ///< ulong
-		Char,		 ///< char
+		For,		 ///< for
+		Int16,		 ///< i16
+		Int32,		 ///< i32
+		Int64,		 ///< i64
+		Let,		 ///< let
+		Mut,		 ///< mut
+		Ret,		 ///< ret
+		UInt16,		 ///< u16
+		UInt32,		 ///< u32
+		UInt64,		 ///< u64
 		Bool,		 ///< bool
+		Char,		 ///< char
+		Elif,		 ///< elif
+		Else,		 ///< else
+		Long,		 ///< long
+		Loop,		 ///< loop
 		True,		 ///< true
+		Break,		 ///< break
 		False,		 ///< false
+		Local,		 ///< local
+		Match,		 ///< match
+		ULong,		 ///< ulong
+		Import,		 ///< import
+		Module,		 ///< module
+		Struct,		 ///< struct
+		Continue,	 ///< continue
 		Ident,		 ///< Identifier
 
 		Int32Literal,	   ///< 1234567890
@@ -131,20 +137,21 @@ public:
 		StringLiteral,	   ///< ""
 		CharLiteral,	   ///< ''
 
-		Unknown,	///< Generated for tokens that are unknown
+		Unknown,	///< Default token type value
 		Eof			///< End of file token
 	};
 
 public:
+	Token();
 	Token(const Type type);
 	Token(const Type type, const Symbol symbol);
 
 public:
-	Type type;	  ///< The type of the token
-	Symbol symbol;
-	size_t offset;
+	Type type;		  ///< The type of the token
+	Symbol symbol;	  ///< The tokens symbol
+	SourcePos pos;	  ///< The source of the token (just positional data)
 };
 
-const extern std::unordered_map<std::string, Token::Type, FastStringHash> stringToTokenType;
+auto GetKeywordType(const std::string &str) -> Token::Type;
 
 }

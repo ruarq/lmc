@@ -25,9 +25,12 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
+#include <string>
 #include <vector>
 
+#include "../Config.hpp"
 #include "Token.hpp"
 
 namespace Lm
@@ -36,18 +39,37 @@ namespace Lm
 class Lexer final
 {
 public:
+	Lexer(const std::string &source);
+
+public:
 	/**
-	 * @brief Run the lexer over a source
+	 * @brief Get the next token
 	 */
-	auto Run(const char *source, const char *end) -> std::vector<Token>;
+	auto NextToken() -> Token;
+
+	/**
+	 * @return True if eof
+	 */
+	auto Eof() const -> bool;
 
 private:
-	auto NextToken() -> Token;
+	/**
+	 * @brief Lex one token
+	 */
+	auto LexToken() -> Token;
 
 private:
 	const char *start;
 	const char *curr;
 	const char *end;
+
+	SourcePos pos;
+	size_t line, column;
+
+#if LM_LEXER_BUFFER_ENABLE
+	size_t bufToken = LM_LEXER_BUFFER_SIZE;
+	std::array<Token, LM_LEXER_BUFFER_SIZE> buffer;
+#endif
 };
 
 }

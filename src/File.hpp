@@ -37,20 +37,6 @@ namespace Lm
 class File final
 {
 public:
-	struct Pos final
-	{
-		size_t line;
-		size_t column;
-	};
-
-	struct Loc final
-	{
-		Pos start;
-		Pos end;
-		size_t offset;
-	};
-
-public:
 	/**
 	 * @brief Load from file
 	 * @param filename The name of the file

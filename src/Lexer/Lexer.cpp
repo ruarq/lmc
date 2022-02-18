@@ -28,46 +28,69 @@
 namespace Lm
 {
 
-auto Lexer::Run(const char *source_, const char *end_) -> std::vector<Token>
+Lexer::Lexer(const std::string &source)
+	: start(source.data())
+	, curr(start)
+	, end(source.data() + source.size())
 {
-	start = source_;
-	curr = source_;
-	end = end_;
-
-	std::vector<Token> tokens;
-	while (curr < end)
-	{
-		auto token = NextToken();
-		if (token.type != Token::Type::Unknown)
-		{
-			token.offset = curr - start;
-			tokens.push_back(token);
-		}
-	}
-
-	tokens.push_back(Token::Type::Eof);
-
-	return tokens;
+	pos = { .line = 1, .column = 0, .offset = 0 };
 }
 
 auto Lexer::NextToken() -> Lm::Token
 {
-NEXT_TOKEN:
+#if LM_LEXER_BUFFER_ENABLE
+	if (bufToken >= buffer.size())
+	{
+		bufToken = 0;
+		for (auto &token : buffer)
+		{
+			token = LexToken();
+			token.pos = pos;
+		}
+	}
+
+	return buffer[bufToken++];
+#else
+	auto token = LexToken();
+	token.pos = pos;
+	return token;
+#endif
+}
+
+auto Lexer::Eof() const -> bool
+{
+	return curr < end;
+}
+
+auto Lexer::LexToken() -> Lm::Token
+{
+L_LEX_TOKEN:
+
+	pos.line = line;
+	pos.column = column;
+	pos.offset = curr - start;
 
 	switch (*curr++)
 	{
+		case '\0': return Token::Type::Eof;
+
 		// Skip whitespace
 		case ' ':
-		case '\n':
+		case '\n': ++line; [[fallthrough]];
 		case '\t':
 		case '\r':
 		case '\f':
-			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t' || *curr == '\r' ||
-									 *curr == '\f'))
+			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t'))
 			{
+				if (*curr == '\n')
+				{
+					column = 0;
+					++line;
+				}
+
 				++curr;
 			}
-			goto NEXT_TOKEN;
+			goto L_LEX_TOKEN;
 
 		// Skip comments
 		case '#':
@@ -75,7 +98,7 @@ NEXT_TOKEN:
 			{
 				++curr;
 			}
-			goto NEXT_TOKEN;
+			goto L_LEX_TOKEN;
 
 		case '0' ... '9':
 		{
@@ -113,13 +136,8 @@ NEXT_TOKEN:
 			}
 
 			std::string symbol(tokStart, curr);
-			auto type = Token::Type::Ident;
 
-			if (stringToTokenType.find(symbol) != stringToTokenType.end())
-			{
-				type = stringToTokenType.at(symbol);
-			}
-
+			const auto type = GetKeywordType(symbol);
 			if (type == Token::Type::Ident)
 			{
 				return Token(type, std::move(symbol));
@@ -131,7 +149,7 @@ NEXT_TOKEN:
 		case '"':
 		{
 			const auto tokStart = curr;
-			while (curr < end && *curr != '"' && '\n')
+			while (curr < end && *curr != '"' && *curr != '\n')
 			{
 				++curr;
 			}
@@ -144,8 +162,8 @@ NEXT_TOKEN:
 
 		case '\'':
 		{
-			std::string symbol = { *curr };
-			if (*++curr)
+			std::string symbol = { *curr++ };
+			if (*curr != '\'')
 			{
 				// TODO(ruarq): error
 			}
@@ -324,6 +342,7 @@ NEXT_TOKEN:
 		default: break;
 	}
 
-	return Token::Type::Unknown;
+	// TODO(ruarq): Error
+	goto L_LEX_TOKEN;
 }
 }

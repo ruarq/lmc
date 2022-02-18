@@ -30,16 +30,25 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
+#include "Config.hpp"
 #include "File.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Logger.hpp"
 #include "Opt/Parse.hpp"
 #include "Parser/Parser.hpp"
-#include "Tools.hpp"
-#include "FastStringHash.hpp"
 
 using namespace std::string_literals;
+
+auto LoadLocale() -> void
+{
+	auto locale = Lm::Locale::Full();
+	if (locale.empty())
+	{
+		locale = Lm::Locale::Default();
+	}
+	Lm::Locale::LoadFromFile("data/locales/"s + locale);
+}
 
 // TODO(ruarq): File a bug report about this, clang format formats
 // "auto main(int argc, char **argv) -> int"
@@ -48,12 +57,15 @@ using namespace std::string_literals;
 // auto main(int argc, char **argv) -> int
 int main(int argc, char **argv)
 {
-	Lm::Locale::LoadFromFile("data/locales/"s + Lm::Locale::Full());
+	LoadLocale();
 
 	// We need the help text in the "help" option, but
 	// we can only generate it after declaring the option
 	// array.
 	std::string helpText;
+
+	// Whether benchmarking should be done or not
+	bool benchmark = false;
 
 	const std::vector<Lm::Opt::Option> options = {
 	// clang-format off
@@ -78,6 +90,15 @@ int main(int argc, char **argv)
 			Lm::Locale::Get("HELP_LOCALE_DESCRIPTION")
 		},
 		{
+			"benchmark",
+			Lm::Opt::Option::noShortOption,
+			Lm::Opt::Option::Argument::None,
+			[&benchmark](const std::string &) {
+				benchmark = true;
+			},
+			Lm::Locale::Get("HELP_BENCHMARK_DESCRIPTION")
+		},
+		{
 			"help",
 			Lm::Opt::Option::noShortOption,
 			Lm::Opt::Option::Argument::None,
@@ -95,6 +116,7 @@ int main(int argc, char **argv)
 	// Generate help text
 	helpText = Lm::Opt::GenerateHelpText(options);
 
+	// Remove duplicates
 	auto RemoveDups = [](auto &list) {
 		const auto copy = std::move(list);
 
@@ -130,22 +152,35 @@ int main(int argc, char **argv)
 		/**
 		 * Lexing
 		 */
-		Lm::Lexer lexer;
+		Lm::Lexer lexer(content);
 
-		LM_IGNORE_IN_RELEASE(const auto lexingStart = std::chrono::high_resolution_clock::now();)
-		const auto tokens = lexer.Run(content.data(), content.data() + content.size());
-		LM_IGNORE_IN_RELEASE(
-			const auto lexingEnd = std::chrono::high_resolution_clock::now();
-			const auto duration = std::chrono::duration<double>(lexingEnd - lexingStart);)
+		if (benchmark)
+		{
+			const auto start = std::chrono::high_resolution_clock::now();
+			while (lexer.NextToken().type != Lm::Token::Type::Eof)
+				;
+
+			const auto end = std::chrono::high_resolution_clock::now();
+
+			const auto duration = std::chrono::duration<double>(end - start);
+
+			Lm::Logger::Info("{}: - {} - {:.2f} MiB/s",
+				file.Name(),
+				duration,
+				(double)(file.Size()) / (duration.count() * (double)(1 << 20)));
+		}
+		else
+		{
+		}
 
 		Lm::Symbol::DropHashmap();
 
-		LM_DEBUG("{}: - {} token(s) - {} - {:.2f} MiB/s",
-			file.Name(),
-			tokens.size(),
-			duration,
-			(double)(file.Size()) /
-				(duration.count() * 1048576.0));	// Conversion from B/s to MiB/s
+		// for (const auto &token : tokens)
+		// {
+		// 	fmt::print("'{}' - {}\n",
+		// 		token.symbol ? token.symbol.String() : "No symbol",
+		// 		content.substr(token.offset, token.size));
+		// }
 
 		/**
 		 * Parsing
