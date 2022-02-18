@@ -44,6 +44,10 @@ public:
 
 public:
 	static auto NextId() -> symbol_id_t;
+
+	/**
+	 * @brief Frees the memory of the stringToId hashmap. We don't need it anymore after lexing.
+	 */
 	static auto DropHashmap() -> void;
 
 public:
