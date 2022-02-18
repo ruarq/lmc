@@ -136,8 +136,8 @@ L_LEX_TOKEN:
 			}
 
 			std::string symbol(tokStart, curr);
-			auto type = GetKeywordType(symbol);
 
+			const auto type = GetKeywordType(symbol);
 			if (type == Token::Type::Ident)
 			{
 				return Token(type, std::move(symbol));
@@ -149,7 +149,7 @@ L_LEX_TOKEN:
 		case '"':
 		{
 			const auto tokStart = curr;
-			while (curr < end && *curr != '"' && '\n')
+			while (curr < end && *curr != '"' && *curr != '\n')
 			{
 				++curr;
 			}
@@ -162,8 +162,8 @@ L_LEX_TOKEN:
 
 		case '\'':
 		{
-			std::string symbol = { *curr };
-			if (*++curr)
+			std::string symbol = { *curr++ };
+			if (*curr != '\'')
 			{
 				// TODO(ruarq): error
 			}
