@@ -187,7 +187,6 @@ int main(int argc, char **argv)
 
 		delete unit;
 
-		// for (const auto &token : tokens)
 		// {
 		// 	fmt::print("'{}' - {}\n",
 		// 		token.symbol ? token.symbol.String() : "No symbol",

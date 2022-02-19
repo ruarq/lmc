@@ -35,6 +35,7 @@ Diagnostics::Diagnostics(const File &file)
 
 auto Diagnostics::Error(const SourcePos &where, const std::string &what) const -> void
 {
+	LM_DEBUG("{} {} {}", where.line, where.column, where.offset);
 	const auto line = LoadLine(where);
 	fmt::print("{} {} {}\n{}\n",
 		fmt::format(fmt::fg(fmt::color::red) | fmt::emphasis::bold, "{}:", Locale::Get("ERROR")),
@@ -42,12 +43,13 @@ auto Diagnostics::Error(const SourcePos &where, const std::string &what) const -
 		what,
 		line);
 
-	Here(line, where.column, where.column, '^', '~');
+	Here(line, where.column - 1, where.column - 1, '^', '~');
 }
+
 auto Diagnostics::LoadLine(const SourcePos &pos) const -> std::string
 {
-	auto start = file.Buf() + pos.offset;
-	auto end = start;
+	auto start = file.Buf() + pos.offset - 1;
+	auto end = start + 1;
 
 	// find the start of the line
 	while (*start != '\n' && start >= file.Buf())
@@ -57,7 +59,7 @@ auto Diagnostics::LoadLine(const SourcePos &pos) const -> std::string
 	++start;
 
 	// find the end of the line
-	while (*end != '\n')
+	while (*end != '\n' && end < file.Buf() + file.Size())
 	{
 		++end;
 	}
@@ -72,7 +74,7 @@ auto Diagnostics::Here(const std::string &line,
 	const char underline) const -> void
 {
 	std::string pre;
-	for (column_t i = 0; i < from - 1; ++i)
+	for (column_t i = 0; i < from; ++i)
 	{
 		if (line[i] == '\t')
 		{

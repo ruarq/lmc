@@ -54,6 +54,11 @@ private:
 	 */
 	auto Consume(const Token::Type type, const std::string &expected) -> void;
 
+	/**
+	 * @brief Consume any token
+	 */
+	inline auto Consume() -> void;
+
 private:
 	Lexer &lexer;
 	const Diagnostics &diagnostics;

@@ -49,20 +49,35 @@ auto Parser::GlobalStmt() -> Ast::Statement *
 	switch (curr.type)
 	{
 		case Token::Type::Fn: return FunctionDecl();
-		default: diagnostics.Error(curr.pos, "unexpected token"); return nullptr;
+		default:
+			diagnostics.Error(curr.pos, Locale::Get("PARSER_ERROR_UNEXPECTED_TOKEN"));
+			return nullptr;
 	}
 }
 
 auto Parser::FunctionDecl() -> Ast::FunctionDecl *
 {
+	Consume(Token::Type::Fn, "fn");
 	auto fn = new Ast::FunctionDecl();
-	Consume(Token::Type::Ident, "identifier");
 
 	fn->ident = curr.symbol;
-	fn->type = Symbol("void");
+	Consume(Token::Type::Ident, "identifier");
 
 	Consume(Token::Type::LParen, "(");
 	Consume(Token::Type::RParen, ")");
+
+	if (curr.type == Token::Type::Arrow)
+	{
+		Consume();
+		fn->type = curr.symbol;
+		Consume(Token::Type::Int32, "i32");
+	}
+	else
+	{
+		// TODO(ruarq): Global constant for this
+		fn->type = Symbol("__void");
+	}
+
 	Consume(Token::Type::LCurly, "{");
 	Consume(Token::Type::RCurly, "}");
 
@@ -71,12 +86,18 @@ auto Parser::FunctionDecl() -> Ast::FunctionDecl *
 
 auto Parser::Consume(const Token::Type type, const std::string &expected) -> void
 {
-	curr = lexer.NextToken();
-
 	if (curr.type != type)
 	{
-		diagnostics.Error(curr.pos, fmt::format("expected {}", expected));
+		diagnostics.Error(curr.pos,
+			fmt::format(Locale::Get("PARSER_ERROR_EXPECTED_TOKEN"), expected));
 	}
+
+	Consume();
+}
+
+auto Parser::Consume() -> void
+{
+	curr = lexer.NextToken();
 }
 
 }

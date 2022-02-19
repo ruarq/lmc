@@ -31,6 +31,7 @@
 #include "File.hpp"
 #include "Lexer/Token.hpp"
 #include "Localization/Locale.hpp"
+#include "Logger.hpp"
 
 namespace Lm
 {

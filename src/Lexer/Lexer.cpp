@@ -94,12 +94,13 @@ L_LEX_TOKEN:
 		case '\r':
 		case '\f':
 		{
-			const auto prev = curr;
+			auto prev = curr;
 			while (curr < end && (*curr == ' ' || *curr == '\n' || *curr == '\t'))
 			{
 				if (*curr == '\n')
 				{
 					column = COLUMN_START;
+					prev = curr;
 					++line;
 				}
 
@@ -115,7 +116,7 @@ L_LEX_TOKEN:
 			{
 				++curr;
 			}
-			++curr;	   // Whitespace
+			++curr;	   // \n
 			column = COLUMN_START;
 			++line;
 			goto L_LEX_TOKEN;
@@ -164,6 +165,10 @@ L_LEX_TOKEN:
 			const auto type = GetKeywordType(symbol);
 			if (type == Token::Type::Ident)
 			{
+				if (!ValidateIdentifier(symbol))
+				{
+					goto L_LEX_TOKEN;
+				}
 				return Token(type, std::move(symbol));
 			}
 
@@ -378,6 +383,17 @@ auto Lexer::Next() -> void
 {
 	++curr;
 	++column;
+}
+
+auto Lexer::ValidateIdentifier(const std::string &identifier) -> bool
+{
+	if (identifier.size() >= 2 && identifier[0] == '_' && identifier[1] == '_')
+	{
+		diagnostics.Error(pos, fmt::format(Locale::Get("LEXER_ERROR_INVALID_IDENT"), identifier));
+		return false;
+	}
+
+	return true;
 }
 
 }

@@ -68,6 +68,11 @@ private:
 	 */
 	inline auto Next() -> void;
 
+	/**
+	 * @brief validate identifiers
+	 */
+	inline auto ValidateIdentifier(const std::string &identifier) -> bool;
+
 private:
 	const char *start;
 	const char *curr;
@@ -77,7 +82,7 @@ private:
 	line_t line;
 	column_t column;
 
-	Diagnostics diagnostics;
+	const Diagnostics &diagnostics;
 
 #if LM_LEXER_BUFFER_ENABLE
 	size_t bufToken = LM_LEXER_BUFFER_SIZE;
