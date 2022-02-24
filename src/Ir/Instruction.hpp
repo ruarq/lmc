@@ -25,50 +25,25 @@
 
 #pragma once
 
+#include <string>
+
 #include "../Symbol.hpp"
 
 namespace Lm::Ir
 {
 
-class Operand final
-{
-public:
-	/* Register, Symbol, Constant */
-};
-
-class Operation final
-{
-public:
-	enum class Type
-	{
-		Move
-	};
-
-public:
-	Type type;
-	Operand result;
-	Operand a, b;
-};
-
 class Instruction final
 {
 public:
-	enum class Tag
+	enum class Type
 	{
 		Label,
 		Op,
 		Return
 	};
 
-	union Storage final
-	{
-		Operation op;
-		Symbol label;
-	};
-
 public:
-	Storage as;
-	Tag tag;
+	Type type;
 };
 
 }

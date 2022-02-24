@@ -33,3 +33,9 @@
 
 #define LM_LEXER_BUFFER_ENABLE 1
 #define LM_LEXER_BUFFER_SIZE 1024
+
+#define LM_DELETE(ptr) \
+	if (ptr) \
+	{ \
+		delete (ptr); \
+	}

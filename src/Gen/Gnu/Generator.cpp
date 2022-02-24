@@ -36,18 +36,11 @@ auto Compile(const std::vector<Ir::Instruction> &instructions) -> void
 
 	for (auto &instr : instructions)
 	{
-		switch (instr.tag)
+		switch (instr.type)
 		{
-			case Ir::Instruction::Tag::Label: fmt::print("{}:\n", instr.as.label.String()); break;
-			case Ir::Instruction::Tag::Return: fmt::print("\tret\n"); break;
-
-			case Ir::Instruction::Tag::Op:
-			{
-				switch (instr.as.op.type)
-				{
-					case Ir::Operation::Type::Move: fmt::print("\tmov $0, %rax\n"); break;
-				}
-			}
+			case Ir::Instruction::Type::Label: fmt::print("{}:\n", instr.arg1.String()); break;
+			case Ir::Instruction::Type::Return: fmt::print("\tmov $0, %rax\n\tret\n"); break;
+			default: fmt::print("Unreachable\n");	 // should be
 		}
 	}
 }

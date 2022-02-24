@@ -57,11 +57,11 @@ auto Parser::GlobalStmt() -> Ast::Statement *
 
 auto Parser::FunctionDecl() -> Ast::FunctionDecl *
 {
-	Consume(Token::Type::Fn, "fn");
-	auto fn = new Ast::FunctionDecl();
+	auto fn = Alloc<Ast::FunctionDecl>();
 
-	fn->ident = curr.symbol;
-	Consume(Token::Type::Ident, "identifier");
+	Consume(Token::Type::Fn, "fn");
+
+	fn->ident = Ident();
 
 	Consume(Token::Type::LParen, "(");
 	Consume(Token::Type::RParen, ")");
@@ -78,13 +78,79 @@ auto Parser::FunctionDecl() -> Ast::FunctionDecl *
 		fn->type = Symbol("__void");
 	}
 
-	Consume(Token::Type::LCurly, "{");
-	Consume(Token::Type::RCurly, "}");
+	fn->statements = StmtBlock();
 
 	return fn;
 }
 
-auto Parser::Consume(const Token::Type type, const std::string &expected) -> void
+auto Parser::StmtBlock() -> Ast::StmtBlock *
+{
+	auto stmtBlock = Alloc<Ast::StmtBlock>();
+	stmtBlock->pos = curr.pos;
+
+	Consume(Token::Type::LCurly, "{");
+
+	while (!Eof() && curr.type != Token::Type::RCurly)
+	{
+		stmtBlock->statements.push_back(Statement());
+	}
+
+	Consume(Token::Type::RCurly, "}");
+
+	return stmtBlock;
+}
+
+auto Parser::Statement() -> Ast::Statement *
+{
+	switch (curr.type)
+	{
+		case Token::Type::Ret: return ReturnStmt();
+		default:
+			diagnostics.Error(curr.pos, Locale::Get("PARSER_ERROR_UNEXPECTED_TOKEN"));
+			return nullptr;
+	}
+}
+
+auto Parser::ReturnStmt() -> Ast::ReturnStmt *
+{
+	auto returnStmt = Alloc<Ast::ReturnStmt>();
+	Consume(Token::Type::Ret, "ret");
+	returnStmt->expr = Expression();
+	Consume(Token::Type::Semicolon, ";");
+	return returnStmt;
+}
+
+auto Parser::Expression() -> Ast::Expression *
+{
+	switch (curr.type)
+	{
+		case Token::Type::Int32Literal:
+		{
+			auto int32Expr = Alloc<Ast::Int32Expr>();
+			const auto tok = Consume(Token::Type::Int32Literal, "i32 literal");
+			if (tok.symbol)
+			{
+				int32Expr->value = std::stoi(tok.symbol.String());
+			}
+			return int32Expr;
+		}
+
+		default:
+			diagnostics.Error(curr.pos, Locale::Get("PARSER_ERROR_UNEXPECTED_TOKEN"));
+			return nullptr;
+	}
+}
+
+auto Parser::Ident() -> Ast::Identifier
+{
+	Ast::Identifier ident;
+	ident.pos = curr.pos;
+	const auto tok = Consume(Token::Type::Ident, "identifier");
+	ident.symbol = tok.symbol;
+	return ident;
+}
+
+auto Parser::Consume(const Token::Type type, const std::string &expected) -> Token
 {
 	if (curr.type != type)
 	{
@@ -92,12 +158,19 @@ auto Parser::Consume(const Token::Type type, const std::string &expected) -> voi
 			fmt::format(Locale::Get("PARSER_ERROR_EXPECTED_TOKEN"), expected));
 	}
 
-	Consume();
+	return Consume();
 }
 
-auto Parser::Consume() -> void
+auto Parser::Consume() -> Token
 {
+	const auto ret = curr;
 	curr = lexer.NextToken();
+	return ret;
+}
+
+auto Parser::Eof() const -> bool
+{
+	return curr.type == Token::Type::Eof;
 }
 
 }

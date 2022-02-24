@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 21.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -34,10 +34,13 @@
 namespace Lm::Ast
 {
 
-class TranslationUnit final : public Node
+/**
+ * @brief Statement block, starts with { and ends with }
+ */
+class StmtBlock final : public Node
 {
 public:
-	~TranslationUnit();
+	~StmtBlock();
 
 public:
 	std::vector<Statement *> statements;

@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 21.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,24 +23,14 @@
  * IN THE SOFTWARE.
  */
 
-#pragma once
-
-#include <vector>
-
-#include "../../Macros.hpp"
-#include "Node.hpp"
-#include "Statement.hpp"
+#include "ReturnStmt.hpp"
 
 namespace Lm::Ast
 {
 
-class TranslationUnit final : public Node
+ReturnStmt::~ReturnStmt()
 {
-public:
-	~TranslationUnit();
-
-public:
-	std::vector<Statement *> statements;
-};
+	LM_DELETE(expr);
+}
 
 }

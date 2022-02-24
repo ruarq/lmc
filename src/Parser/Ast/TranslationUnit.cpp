@@ -30,12 +30,9 @@ namespace Lm::Ast
 
 TranslationUnit::~TranslationUnit()
 {
-	for (auto stmt : statements)
+	for (const auto stmt : statements)
 	{
-		if (stmt)
-		{
-			delete stmt;
-		}
+		LM_DELETE(stmt);
 	}
 }
 

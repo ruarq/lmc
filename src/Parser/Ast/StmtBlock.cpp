@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 21.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,24 +23,17 @@
  * IN THE SOFTWARE.
  */
 
-#pragma once
-
-#include <vector>
-
-#include "../../Macros.hpp"
-#include "Node.hpp"
-#include "Statement.hpp"
+#include "StmtBlock.hpp"
 
 namespace Lm::Ast
 {
 
-class TranslationUnit final : public Node
+StmtBlock::~StmtBlock()
 {
-public:
-	~TranslationUnit();
-
-public:
-	std::vector<Statement *> statements;
-};
+	for (const auto stmt : statements)
+	{
+		LM_DELETE(stmt);
+	}
+}
 
 }

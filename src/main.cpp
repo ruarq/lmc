@@ -192,15 +192,11 @@ int main(int argc, char **argv)
 		auto instructions = {
 	// clang-format off
 			Lm::Ir::Instruction {
-				.as = { .label = Lm::Symbol("main") },
-				.tag = Lm::Ir::Instruction::Tag::Label
+				.type = Lm::Ir::Instruction::Type::Label,
+				.arg1 = { .as = { .symbol = Lm::Symbol("main") }, .tag = Lm::Ir::Operand::Tag::Symbol }
 			},
 			Lm::Ir::Instruction {
-				.as = { .op = { .type = Lm::Ir::Operation::Type::Move } },
-				.tag = Lm::Ir::Instruction::Tag::Op
-			},
-			Lm::Ir::Instruction {
-				.tag = Lm::Ir::Instruction::Tag::Return
+				.type = Lm::Ir::Instruction::Type::Return
 			}
 	// clang-format on
 		};

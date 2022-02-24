@@ -30,8 +30,13 @@
 #include "../Diagnostics.hpp"
 #include "../Lexer/Lexer.hpp"
 #include "../Lexer/Token.hpp"
+#include "Ast/Expression.hpp"
 #include "Ast/FunctionDecl.hpp"
+#include "Ast/Identifier.hpp"
+#include "Ast/Int32Expr.hpp"
 #include "Ast/Node.hpp"
+#include "Ast/ReturnStmt.hpp"
+#include "Ast/StmtBlock.hpp"
 #include "Ast/TranslationUnit.hpp"
 
 namespace Lm
@@ -48,16 +53,33 @@ public:
 private:
 	auto GlobalStmt() -> Ast::Statement *;
 	auto FunctionDecl() -> Ast::FunctionDecl *;
+	auto StmtBlock() -> Ast::StmtBlock *;
+	auto Statement() -> Ast::Statement *;
+	auto ReturnStmt() -> Ast::ReturnStmt *;
+
+	auto Expression() -> Ast::Expression *;
+
+	inline auto Ident() -> Ast::Identifier;
 
 	/**
 	 * @brief Consume a specific token type
 	 */
-	auto Consume(const Token::Type type, const std::string &expected) -> void;
+	auto Consume(const Token::Type type, const std::string &expected) -> Token;
 
 	/**
 	 * @brief Consume any token
 	 */
-	inline auto Consume() -> void;
+	inline auto Consume() -> Token;
+
+	inline auto Eof() const -> bool;
+
+	template<typename T>
+	inline auto Alloc() -> T *
+	{
+		auto node = new T();
+		node->pos = curr.pos;
+		return node;
+	}
 
 private:
 	Lexer &lexer;

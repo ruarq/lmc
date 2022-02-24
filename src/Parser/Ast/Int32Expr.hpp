@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 21.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -25,22 +25,17 @@
 
 #pragma once
 
-#include <vector>
+#include <cstdint>
 
-#include "../../Macros.hpp"
-#include "Node.hpp"
-#include "Statement.hpp"
+#include "Expression.hpp"
 
 namespace Lm::Ast
 {
 
-class TranslationUnit final : public Node
+class Int32Expr final : public Expression
 {
 public:
-	~TranslationUnit();
-
-public:
-	std::vector<Statement *> statements;
+	uint32_t value;
 };
 
 }

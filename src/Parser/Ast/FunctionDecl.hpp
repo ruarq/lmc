@@ -29,7 +29,9 @@
 #include <vector>
 
 #include "../../Symbol.hpp"
+#include "Identifier.hpp"
 #include "Statement.hpp"
+#include "StmtBlock.hpp"
 
 namespace Lm::Ast
 {
@@ -37,8 +39,10 @@ namespace Lm::Ast
 class FunctionDecl final : public Statement
 {
 public:
-	Symbol ident;
+	Identifier ident;
 	Symbol type;
+
+	StmtBlock *statements;
 };
 
 }

@@ -1,6 +1,6 @@
 /**
  * @author ruarq
- * @date 14.02.2022 
+ * @date 20.02.2022 
  *
  * Copyright (C) 2022 ruarq
  * 
@@ -23,24 +23,18 @@
  * IN THE SOFTWARE.
  */
 
-#pragma once
+#include "Instruction.hpp"
 
-#include <vector>
-
-#include "../../Macros.hpp"
-#include "Node.hpp"
-#include "Statement.hpp"
-
-namespace Lm::Ast
+namespace Lm::Ir
 {
 
-class TranslationUnit final : public Node
+auto Operand::String() const -> std::string
 {
-public:
-	~TranslationUnit();
-
-public:
-	std::vector<Statement *> statements;
-};
+	switch (tag)
+	{
+		case Tag::Symbol: return as.symbol.String();
+		default: return "Unreachable";	  // should be
+	}
+}
 
 }
