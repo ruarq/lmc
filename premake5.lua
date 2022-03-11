@@ -12,6 +12,10 @@ project "lmc"
 
 	files { "src/**.hpp", "src/**.cpp" }
 
+	filter { "system:macosx" }
+		buildoptions { "`pkg-config fmt --cflags`" }
+		linkoptions { "`pkg-config fmt --libs-only-L`" }
+
 	filter { "configurations:debug" }
 		symbols "On"
 		defines { "DEBUG" }

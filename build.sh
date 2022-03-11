@@ -11,7 +11,7 @@ fi
 echo "==== generating make files ===="
 
 # run premake5
-./premake5 gmake2
+premake5 gmake2
 
 echo ""
 make config=$config

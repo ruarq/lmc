@@ -32,8 +32,6 @@
 
 #include "Diagnostics.hpp"
 #include "File.hpp"
-#include "Gen/Gnu/Generator.hpp"
-#include "Ir/Instruction.hpp"
 #include "Lexer/Lexer.hpp"
 #include "Localization/Locale.hpp"
 #include "Logger.hpp"
@@ -188,20 +186,6 @@ int main(int argc, char **argv)
 		Lm::Symbol::DropHashmap();
 
 		delete unit;
-
-		auto instructions = {
-	// clang-format off
-			Lm::Ir::Instruction {
-				.type = Lm::Ir::Instruction::Type::Label,
-				.arg1 = { .as = { .symbol = Lm::Symbol("main") }, .tag = Lm::Ir::Operand::Tag::Symbol }
-			},
-			Lm::Ir::Instruction {
-				.type = Lm::Ir::Instruction::Type::Return
-			}
-	// clang-format on
-		};
-
-		Lm::Gen::Gnu::Compile(instructions);
 
 		// {
 		// 	fmt::print("'{}' - {}\n",

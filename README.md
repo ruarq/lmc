@@ -11,13 +11,11 @@ Fast. Simple. Beautiful. (pun intended)
 - clang-format:13.0.1
 - make:4.3
 - libfmt:8.1.1-1
+- premake-5.0.0-beta1
 
-#### Linux
-Linux is the only officially supported platform, though in theory, the code *should* work on Windows or even MacOS.
-To build, simply run:
-```bash
-./build.sh
-```
+#### Linux and MacOS
+Linux and MacOS is the only officially supported platforms, though in theory, the code *should* work on Windows.
+After you installed all dependencies, simply run `./build.sh` to build the project.
 
 This will generate an executable in `bin/debug/lmc`.
 To build in release mode, simply pass `release` to the build script:
